@@ -1,0 +1,43 @@
+# environment variables for running the network-discovery script
+# variables in this file override the script variables
+# See the readme file to see the complete list of variables
+#
+# Rename this file to .env or map it in Docker to .env
+
+# example: 
+# ENV=DEBUG
+# ENV=PROD
+
+
+
+#### GLOBAL ENVIRONMENT VARIABLES ####
+
+# PROD or DEBUG
+ENV=PROD  
+
+# True or False
+VERBOSE=True  
+
+# True or False
+DEBUG=True 
+
+
+
+#### ROUTER-PARSER ENVIRONMENT VARIABLES ####
+
+ROUTER_PARSER_DIR="router-parser"
+
+# relative path to where the configs can be found
+ROUTER_PARSER_CONFIG_FOLDER="$ROUTER_PARSER_DIR/configs"
+
+# relative path to the log folder
+ROUTER_PARSER_LOG_FOLDER="$ROUTER_PARSER_DIR/log"
+
+# filename of the log file
+ROUTER_PARSER_LOGFILE="router-parser.log"
+
+# relateive path to the output folder
+ROUTER_PARSER_OUTPUT_FOLDER="$ROUTER_PARSER_DIR/output"
+
+# the maximum age of a config file, older files will be ignored, in number of days
+ROUTER_PARSER_MAX_CONFIG_AGE=4

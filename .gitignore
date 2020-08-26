@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+router-parser/configs/*.txt
+router-parser/logs/*.log
+router-parser/output/*.csv

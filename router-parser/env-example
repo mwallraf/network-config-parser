@@ -1,0 +1,35 @@
+# environment variables for running the router-parse script
+# variables in this file override the script variables
+# See the readme file to see the complete list of variables
+#
+# This file is ONLY used if the ROUTER_PARSER_CONFIG_FOLDER
+# environment variable is not yet set,
+# So basically it is run when the script is started directly
+# instead via the may parser.sh script
+#
+# Rename this file to .env
+
+
+# PROD OR DEBUG
+ENV=PROD  
+
+# True or False
+VERBOSE=True  
+
+# True or False
+DEBUG=True 
+
+# relative path to where the configs can be found
+ROUTER_PARSER_CONFIG_FOLDER="configs"
+
+# relative path to the log folder
+ROUTER_PARSER_LOG_FOLDER="log"
+
+# filename of the log file
+ROUTER_PARSER_LOGFILE="router-parser.log"
+
+# relateive path to the output folder
+ROUTER_PARSER_OUTPUT_FOLDER="output"
+
+# the maximum age of a config file, older files will be ignored, in number of days
+ROUTER_PARSER_MAX_CONFIG_AGE=5 
