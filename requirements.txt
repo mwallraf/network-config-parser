@@ -1,0 +1,5 @@
+ciscoconfparse==1.5.19
+colorama==0.4.3
+dnspython==2.0.0
+logzero==1.5.0
+passlib==1.7.2

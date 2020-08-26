@@ -6,15 +6,21 @@ ENV TZ ${TZ}
 
 RUN apk update
 
-RUN apk add --no-cache bash python3 py3-pip py3-virtualenv py3-yaml tzdata procps
+RUN apk add --no-cache bash python3 py3-pip py3-virtualenv tzdata procps
 
-# Create the network-discovery folder
-RUN mkdir -p /opt/network-discovery
-RUN chmod -R 755 /opt/network-discovery
+# create an alias for python
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+# Create the network-config-parser folder
+RUN mkdir -p /opt/network-config-parser
+RUN chmod -R 755 /opt/network-config-parser
 
 # Add files
 ADD . /opt/network-config-parser
 ADD functions/entrypoint.sh /entrypoint.sh
+
+# install python requirements
+RUN pip install -r /opt/network-config-parser/requirements.txt
 
 RUN chmod -R 755 /entrypoint.sh
 RUN chmod -R 755 /opt/network-config-parser/parser.sh
