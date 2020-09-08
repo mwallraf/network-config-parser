@@ -6,7 +6,7 @@ ENV TZ ${TZ}
 
 RUN apk update
 
-RUN apk add --no-cache bash python3 py3-pip py3-virtualenv tzdata procps
+RUN apk add --no-cache bash python3 python3-dev py3-pip py3-virtualenv tzdata procps lapack libstdc++ g++ gcc gfortran musl-dev lapack-dev
 
 # create an alias for python
 RUN ln -s /usr/bin/python3 /usr/bin/python
