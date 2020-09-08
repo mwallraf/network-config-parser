@@ -33,3 +33,7 @@ ROUTER_PARSER_OUTPUT_FOLDER="output"
 
 # the maximum age of a config file, older files will be ignored, in number of days
 ROUTER_PARSER_MAX_CONFIG_AGE=5 
+
+# enable the network-discovery data to be included
+ADD_NETWORK_DISCOVERY_INFO=true
+NETWORK_DISCOVERY_FILE=network/discovery/network-discovery.csv

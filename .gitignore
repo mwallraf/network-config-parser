@@ -130,3 +130,4 @@ dmypy.json
 router-parser/configs/*.txt
 router-parser/logs/*.log
 router-parser/output/*.csv
+router-parser/__remove__main.py

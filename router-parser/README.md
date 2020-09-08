@@ -1,16 +1,14 @@
-# findhost-inventory
+# router-parser script
 
-Findhost inventory script
+Findhost router-parser inventory script
 
 
 ## ABOUT
-This scripts loads all backup configs from stepstone server, parses them and saves the output back to the stepstone server so that it can be used by findhost-consolidate script.
-
-This is only a temporary solution because this script is failing on stepstone due to memory limits.
+This scripts loads all backup configs from stepstone server, parses them and saves the output back to the stepstone server so that it can be used by findhost-consolidate script or other scripts.
 
 
 ## RUNNING THE SCRIPT
-bash run-py37.sh
+bash run.sh
 
 
 ## CRONTAB
