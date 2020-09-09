@@ -38,6 +38,11 @@ ROUTER_PARSER_LOGFILE="router-parser.log"
 
 # relateive path to the output folder
 ROUTER_PARSER_OUTPUT_FOLDER="$ROUTER_PARSER_DIR/output"
+ROUTER_PARSER_OUTPUT_FILE="router-parser.csv"
 
 # the maximum age of a config file, older files will be ignored, in number of days
 ROUTER_PARSER_MAX_CONFIG_AGE=4
+
+# enable the network-discovery data to be included
+ADD_NETWORK_DISCOVERY_INFO=true
+NETWORK_DISCOVERY_FILE="$ROUTER_PARSER_DIR/network-discovery/network-discovery.csv"

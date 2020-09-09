@@ -30,6 +30,7 @@ ROUTER_PARSER_LOGFILE="router-parser.log"
 
 # relateive path to the output folder
 ROUTER_PARSER_OUTPUT_FOLDER="output"
+ROUTER_PARSER_OUTPUT_FILE="router-parser.csv"
 
 # the maximum age of a config file, older files will be ignored, in number of days
 ROUTER_PARSER_MAX_CONFIG_AGE=5 
