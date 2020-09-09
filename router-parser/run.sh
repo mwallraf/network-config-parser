@@ -54,6 +54,9 @@ if [ $(wc -l "$TMPOUTPUT" | sed -e 's/^[[:space:]]*//' | cut -d" " -f1) -ge $MIN
 	fi
 
     mv $TMPOUTPUT $FINALOUTPUT
+
+else
+    echo "ERROR: output file is expected to have minimum $MINEXPECTEDLINES lines"    
 fi
 
 
