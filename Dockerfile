@@ -26,5 +26,7 @@ RUN chmod -R 755 /entrypoint.sh
 RUN chmod -R 755 /opt/network-config-parser/parser.sh
 RUN chmod -R 755 /opt/network-config-parser/router-parser/run.sh
 
+WORKDIR /opt/network-config-parser
+
 ENTRYPOINT /entrypoint.sh
 
