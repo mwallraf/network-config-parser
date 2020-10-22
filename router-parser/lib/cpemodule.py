@@ -99,6 +99,14 @@ class CpeModule(object):
         to find the function of each config file
         """
 
+        def _parse_header(f, max_lines, rex):
+            lines = []
+            for line in f.readlines()[0:max_lines]:
+                if rex.match(line):
+                    lines.append(line.strip())
+            return lines
+
+
         if not self.parse_function:
             return
 
@@ -107,9 +115,9 @@ class CpeModule(object):
 
         for cfg in configs:
             # read first N lines of a file
-            with open(os.path.join(d, cfg)) as f:
+            with open(os.path.join(d, cfg), encoding='utf-8', errors='ignore') as f:
                 # find all function header lines
-                header_lines = [ l.strip() for l in [ next(f) for x in range(header) ] if rex.match(l) ]
+                header_lines = _parse_header(f, header, rex)
 
                 function = self.UNKNOWN_FUNCTION
 
