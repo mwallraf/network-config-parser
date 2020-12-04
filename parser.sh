@@ -42,9 +42,12 @@ readonly SCRIPT_NAME=${0##*/}
 # Define temp folders and other locations
 readonly ROUTER_PARSER_DIR="$SCRIPTDIR/router-parser"
 readonly ROUTER_PARSER="$ROUTER_PARSER_DIR/run.sh"
+readonly CARRIER_ETHERNET_PARSER_DIR="$SCRIPTDIR/carrierethernet-parser"
+readonly CARRIER_ETHERNET_PARSER="$CARRIER_ETHERNET_PARSER_DIR/run-carrierethernet-parser.sh"
 
 # switch that decides if the router-processor script has to run
 declare RUN_ROUTER_PARSER=
+declare RUN_CARRIER_ETHERNET_PARSER=
 declare SHOWHELP=true
 
 
@@ -128,6 +131,13 @@ echo "working dir = `pwd`"
 
   fi  
 
+  if [ ${RUN_CARRIER_ETHERNET_PARSER} ]; then
+
+    start_carrier_ethernet_parser
+
+  fi  
+  
+
   echo "--- The script has taken $SECONDS seconds to finish ---"
 
 echo "working dir = `pwd`"
@@ -144,6 +154,17 @@ function start_router_parser() {
     . $ROUTER_PARSER
 
 }
+
+
+#######################################
+# runs the carrier-ethernet-parser script
+#######################################
+function start_carrier_ethernet_parser() {
+
+    . $CARRIER_ETHERNET_PARSER
+
+}
+
 
 
 #######################################
@@ -217,6 +238,7 @@ function main() {
       v|version)    version_command; exit 0; ;;
       h|help)       help_command ;;
       router-parser) RUN_ROUTER_PARSER=true ;;
+      carrier-ethernet-parser) RUN_CARRIER_ETHERNET_PARSER=true ;;
       force)        FORCE=true ;;
       # Errors
       ::)   err "Unexpected argument to option '$OPTARG'"; exit 2; ;;
@@ -227,6 +249,7 @@ function main() {
   done
   readonly FORCE
   readonly RUN_ROUTER_PARSER
+  readonly RUN_CARRIER_ETHERNET_PARSER
   shift $((OPTIND-1))
 
   # No more arguments -> call default command

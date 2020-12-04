@@ -1,0 +1,56 @@
+{
+    "type": "NetworkCollection",
+    "collection": [
+        {
+            "type": "Infrabel",
+            "protocol": "olsr",
+            "version": "0.6.6",
+            "revision": "5031a799fcbe17f61d57e387bc3806de",
+            "metric": "etx",
+            "router_id": "172.16.40.24",
+            "nodes": [
+                {
+                    "id": "infrabel-02zav-01"
+                },
+                {
+                    "id": "ant-var-04"
+                },
+                {
+                    "id": "infrabel-02bru-02"
+                },
+                {
+                    "id": "nos-var-05"
+                }
+            ],
+            "links": [
+                {
+                    "source": "infrabel-02zav-01",
+                    "target": "ant-var-04",
+                    "cost": 1,
+                    "properties": {
+                        "lq": 1,
+                        "nlq": 0.497
+                    }
+                },
+                {
+                    "source": "infrabel-02bru-02",
+                    "target": "nos-var-05",
+                    "cost": 1,
+                    "properties": {
+                        "lq": 1,
+                        "nlq": 0.497
+                    }
+                },
+                {
+                    "source": "ant-var-04",
+                    "target": "nos-var-05",
+                    "cost": 10,
+                    "properties": {
+                        "lq": 1,
+                        "nlq": 0.497
+                    }
+                }
+            ]
+        }
+    ]
+}

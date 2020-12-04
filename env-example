@@ -46,3 +46,26 @@ ROUTER_PARSER_MAX_CONFIG_AGE=4
 # enable the network-discovery data to be included
 ADD_NETWORK_DISCOVERY_INFO=true
 NETWORK_DISCOVERY_FILE="$ROUTER_PARSER_DIR/network-discovery/network-discovery.csv"
+
+
+
+
+
+#### CARRIERETHERNET-PARSER ENVIRONMENT VARIABLES ####
+
+# relative path to where the configs can be found
+CARRIERETHERNET_PARSER_CONFIG_FOLDER="configs"
+
+# relative path to the log folder
+CARRIERETHERNET_PARSER_LOG_FOLDER="logs"
+
+# filename of the log file
+CARRIERETHERNET_PARSER_LOGFILE="carrier-ethernet-parser.log"
+
+# relative path to the output folder
+CARRIERETHERNET_PARSER_OUTPUT_FOLDER="output"
+CARRIERETHERNET_PARSER_OUTPUT_FILE="carrier-ethernet-parser.csv"
+
+# the maximum age of a config file, older files will be ignored, in number of days
+CARRIERETHERNET_PARSER_MAX_CONFIG_AGE=5 
+

@@ -1,0 +1,37 @@
+# environment variables for running the carrierethernet-parser script
+# variables in this file override the script variables
+# See the readme file to see the complete list of variables
+#
+# This file is ONLY used if the ROUTER_PARSER_CONFIG_FOLDER
+# environment variable is not yet set,
+# So basically it is run when the script is started directly
+# instead via the may parser.sh script
+#
+# Rename this file to .env
+
+
+# PROD OR DEBUG
+ENV=PROD  
+
+# True or False
+VERBOSE=True  
+
+# True or False
+DEBUG=True 
+
+# relative path to where the configs can be found
+CARRIERETHERNET_PARSER_CONFIG_FOLDER="configs"
+
+# relative path to the log folder
+CARRIERETHERNET_PARSER_LOG_FOLDER="log"
+
+# filename of the log file
+CARRIERETHERNET_PARSER_LOGFILE="carrier-ethernet-parser.log"
+
+# relative path to the output folder
+CARRIERETHERNET_PARSER_OUTPUT_FOLDER="output"
+CARRIERETHERNET_PARSER_OUTPUT_FILE="carrier-ethernet-parser.csv"
+
+# the maximum age of a config file, older files will be ignored, in number of days
+CARRIERETHERNET_PARSER_MAX_CONFIG_AGE=5 
+

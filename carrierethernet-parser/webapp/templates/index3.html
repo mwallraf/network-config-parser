@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>netjsongraph.js: basic example</title>
+    <meta charset="utf-8">
+    <link href="{{ url_for('static', filename='css/netjsongraph.css') }}" rel="stylesheet">
+    <!-- theme can be easily customized via css -->
+    <link href="{{ url_for('static', filename='css/netjsongraph-theme.css') }}" rel="stylesheet">
+    <style>body {overflow: hidden}</style>
+
+    <style>
+		.ringcolor-0 { stroke: #55675D }
+		.ringcolor-1 { stroke: #01FF15 }
+		.ringcolor-2 { stroke: #2369B0 }
+		.ringcolor-3 { stroke: #09C1FE }
+		.ringcolor-4 { stroke: #C5F8C3 }
+		.ringcolor-5 { stroke: #083934 }
+		.ringcolor-6 { stroke: #6B315A }
+		.ringcolor-7 { stroke: #5C54B3 }
+		.ringcolor-8 { stroke: #DD48CD }
+		.ringcolor-9 { stroke: #DF0290 }
+		.ringcolor-10 { stroke: #A79FA3 }
+		.ringcolor-11 { stroke: #C388E6 }
+		.ringcolor-12 { stroke: #FFE344 }
+		.ringcolor-13 { stroke: #A27D38 }
+		.ringcolor-14 { stroke: #E952BA }
+		.ringcolor-15 { stroke: #86B495 }
+		.ringcolor-16 { stroke: #450A27 }
+		.ringcolor-17 { stroke: #1CA2A7 }
+		.ringcolor-18 { stroke: #DDBBCB }
+		.ringcolor-19 { stroke: #EDE6F1 }
+		.ringcolor-20 { stroke: #FE92EC }
+		.ringcolor-21 { stroke: #8B5A12 }
+		.ringcolor-22 { stroke: #161F39 }
+		.ringcolor-23 { stroke: #2BBE3F }
+		.ringcolor-24 { stroke: #943FCE }
+		.ringcolor-25 { stroke: #F378F3 }
+		.ringcolor-26 { stroke: #9A8E23 }
+		.ringcolor-27 { stroke: #AFDBED }
+		.ringcolor-28 { stroke: #C5ED66 }
+		.ringcolor-29 { stroke: #0F424E }
+		.ringcolor-30 { stroke: #856BF4 }
+		.ringcolor-31 { stroke: #2618B4 }
+		.ringcolor-32 { stroke: #BC202C }
+		.ringcolor-33 { stroke: #F03BE8 }
+		.ringcolor-34 { stroke: #D43536 }
+		.ringcolor-35 { stroke: #DEA29E }
+		.ringcolor-36 { stroke: #64C9F3 }
+		.ringcolor-37 { stroke: #5A42C9 }
+		.ringcolor-38 { stroke: #FC592D }
+		.ringcolor-39 { stroke: #4AD451 }
+		.ringcolor-40 { stroke: #DC4CF5 }
+		.ringcolor-41 { stroke: #EFA87F }
+		.ringcolor-42 { stroke: #C5C0F6 }
+		.ringcolor-43 { stroke: #05C835 }
+		.ringcolor-44 { stroke: #7B8910 }
+		.ringcolor-45 { stroke: #384422 }
+		.ringcolor-46 { stroke: #EDF93F }
+		.ringcolor-47 { stroke: #503CB2 }
+		.ringcolor-48 { stroke: #E155E4 }
+		.ringcolor-49 { stroke: #4AED9C }
+		.ringcolor-50 { stroke: #5EE7B8 }
+		.ringcolor-51 { stroke: #6CAA34 }
+		.ringcolor-52 { stroke: #471A8E }
+		.ringcolor-53 { stroke: #DDE276 }
+		.ringcolor-54 { stroke: #E73D11 }
+		.ringcolor-55 { stroke: #7AE091 }
+		.ringcolor-56 { stroke: #081300 }
+		.ringcolor-57 { stroke: #3C1481 }
+		.ringcolor-58 { stroke: #F83E07 }
+		.ringcolor-59 { stroke: #CC17BF }
+		.ringcolor-60 { stroke: #FB98E4 }
+		.ringcolor-61 { stroke: #F83BE5 }
+		.ringcolor-62 { stroke: #A51D0C }
+		.ringcolor-63 { stroke: #5EF875 }
+		.ringcolor-64 { stroke: #75D48D }
+		.ringcolor-65 { stroke: #F26FBB }
+		.ringcolor-66 { stroke: #669B1C }
+		.ringcolor-67 { stroke: #31506A }
+		.ringcolor-68 { stroke: #201BCB }
+		.ringcolor-69 { stroke: #222959 }
+		.ringcolor-70 { stroke: #EA3C18 }
+		.ringcolor-71 { stroke: #45DE5E }
+		.ringcolor-72 { stroke: #0770B8 }
+		.ringcolor-73 { stroke: #81FFD1 }
+		.ringcolor-74 { stroke: #51691F }
+		.ringcolor-75 { stroke: #FE1721 }
+		.ringcolor-76 { stroke: #E05BDD }
+		.ringcolor-77 { stroke: #C77952 }
+		.ringcolor-78 { stroke: #70D857 }
+		.ringcolor-79 { stroke: #3F53E2 }
+		.ringcolor-80 { stroke: #8F6337 }
+		.ringcolor-81 { stroke: #F8C0C2 }
+		.ringcolor-82 { stroke: #C6BA93 }
+		.ringcolor-83 { stroke: #D156DB }
+		.ringcolor-84 { stroke: #B5DA5F }
+		.ringcolor-85 { stroke: #BBC7E0 }
+		.ringcolor-86 { stroke: #D7FEAF }
+		.ringcolor-87 { stroke: #667C60 }
+		.ringcolor-88 { stroke: #39EFA6 }
+		.ringcolor-89 { stroke: #944B84 }
+		.ringcolor-90 { stroke: #ABDD87 }
+		.ringcolor-91 { stroke: #D2A390 }
+		.ringcolor-92 { stroke: #A48AE0 }
+		.ringcolor-93 { stroke: #5C576A }
+		.ringcolor-94 { stroke: #F1999D }
+		.ringcolor-95 { stroke: #85C5ED }
+		.ringcolor-96 { stroke: #3A6133 }
+		.ringcolor-97 { stroke: #FB2D7C }
+		.ringcolor-98 { stroke: #65D431 }
+		.ringcolor-99 { stroke: #40B835 }
+	</style>
+</head>
+<body>
+    <script src="{{ url_for('static', filename='js/d3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/netjsongraph.js') }}"></script>
+    <script>d3.netJsonGraph("{{ url_for('static', filename='data/ring.json') }}", {
+    	metadata: true,
+    	linkClassProperty: "ringcolor"
+    });</script>
+</body>
+</html>
