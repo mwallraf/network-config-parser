@@ -228,7 +228,7 @@ class BlockParser(Parser):
                     # we got an error but check if the model was defined 
                     # as a function
                     #self.logger.debug("map_var={} map_var_type={}".format(map_var, map_var_type))
-                    self.logger.error("we got an error here!")
+                    self.logger.trace("we got an error here!")
                     if map_var == 'function' and mapper.get('function', False):
                         map_var_type = 'function'
 
