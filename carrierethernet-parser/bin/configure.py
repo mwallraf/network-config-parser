@@ -1,7 +1,7 @@
 import logging
 from logging.config import fileConfig
 
-import os
+import os, sys
 
 
 # create a TRACE loglevel
@@ -18,7 +18,6 @@ def log_root(msg, *args, **kwargs):
 
 logging.addLevelName(trace_level, "TRACE")
 logging.trace = log_root
-
 
 # initialize variables, tak from environment if exists
 SCRIPTDIR = os.path.abspath(os.path.dirname(__file__))  ## This directory
@@ -45,6 +44,11 @@ class Config:
 
     APP_DIR = CARRIERETHERNET_PARSER_DIR
     CARRIERETHERNET_PARSER_CONFIG_FOLDER = os.environ.get("CARRIERETHERNET_PARSER_CONFIG_FOLDER", os.path.join(SCRIPTDIR, "configs"))
+    CARRIERETHERNET_PARSER_DB_FOLDER = os.environ.get("CARRIERETHERNET_PARSER_DB_FOLDER", os.path.join(SCRIPTDIR, "db"))
+    CARRIERETHERNET_PARSER_DEBUG_FOLDER = os.environ.get("CARRIERETHERNET_PARSER_DEBUG_FOLDER", os.path.join(SCRIPTDIR, "debug"))
+    CARRIERETHERNET_PARSER_OUTPUT_FOLDER = os.environ.get("CARRIERETHERNET_PARSER_OUTPUT_FOLDER", os.path.join(SCRIPTDIR, "output"))
+    CARRIERETHERNET_PARSER_MAX_CONFIG_AGE = int(os.environ.get("CARRIERETHERNET_PARSER_MAX_CONFIG_AGE", 4))
+    CARRIERETHERNET_PARSER_MAX_PARSED_FILES = int(os.environ.get("CARRIERETHERNET_PARSER_MAX_PARSED_FILES", 1200))
 
 
     #print("config mode")

@@ -25,8 +25,14 @@ CARRIERETHERNET_PARSER_CONFIG_FOLDER="configs"
 # relative path to the log folder
 CARRIERETHERNET_PARSER_LOG_FOLDER="log"
 
-# filename of the log file
-CARRIERETHERNET_PARSER_LOGFILE="carrier-ethernet-parser.log"
+# relative path to the db folder
+CARRIERETHERNET_PARSER_DB_FOLDER="db"
+
+# relative path to the debug folder
+CARRIERETHERNET_PARSER_DEBUG_FOLDER="debug"
+
+# stop the script if there are more files
+MAX_PARSED_FILES=1200
 
 # relative path to the output folder
 CARRIERETHERNET_PARSER_OUTPUT_FOLDER="output"

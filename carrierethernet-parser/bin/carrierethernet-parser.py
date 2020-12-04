@@ -168,10 +168,13 @@ def append_hostname(saos, db_file="db/hosts.json"):
 
 
 def parser(configdir="", configlist=[], 
+                dbfile="db/hosts.json",
                 debug=False, 
                 stopafter=800, 
                 max_config_age_days=4,
-                filefilter=None
+                filefilter=None,
+                output_folder=None,
+                debug_folder=None
                 ):
     """
     Main parser script.
@@ -185,7 +188,7 @@ def parser(configdir="", configlist=[],
 
     saoslist = ParserCollection(debug=debug)
     count = 0
-    hosts_db_file = 'db/hosts.json'
+    hosts_db_file = dbfile
     #filefilter = [ "28050-SDS39-001.txt", "00009-SAS51-011.txt", "00009-SAS51-010.txt", "00009-SAS87-001.txt", "00009-SAS87-002.txt", "00002-SAS87-001.txt", "00002-SAS87-002.txt", "00009-SAS51-002.txt" ]
     #filefilter = [ "28959-SDS39-001.txt", "28967-SDS39-001.txt", "28977-SDS39-001.txt", "00002-SAS51-008.txt", "00002-SAS51-009.txt", "26604-SDS39-001.txt" ]
     #filefilter = [ "28959-SDS39-001.txt", "28967-SDS39-001.txt", "28977-SDS39-001.txt", "00002-SAS51-008.txt", "00002-SAS51-009.txt", "26604-SDS39-001.txt" ]
@@ -252,16 +255,16 @@ def parser(configdir="", configlist=[],
     saoslist.linkCollection()
 
     ### GENERAL INVENTORY INFO
-    F = open('debug/raw.general_inventory.json', 'w')
+    F = open(os.path.join(debug_folder, 'raw.general_inventory.json'), 'w')
     F.write(saoslist.get_general_inventory())
     F.close()
-    F = open('output/general.inventory.{}.csv'.format(today), 'w')
+    F = open(os.path.join(output_folder, 'general.inventory.{}.csv'.format(today)), 'w')
     for line in saoslist.report_general_inventory():
         F.write("{}\n".format(",".join(line)))
     F.close()
 
     ### CONFIG CHECKS INVENTORY
-    F = open('output/general.config_check.{}.csv'.format(today), 'w')
+    F = open(os.path.join(output_folder, 'general.config_check.{}.csv'.format(today)), 'w')
     for line in saoslist.report_config_check():
         F.write("{}\n".format(",".join(line)))
     F.close()
@@ -274,66 +277,66 @@ def parser(configdir="", configlist=[],
                 hosts_db = json.load(f)
     except:
         pass
-    F = open('output/hosts', 'w')
+    F = open(os.path.join(output_folder, 'hosts'), 'w')
     F.write('## CARRIER ETHERNET\n')
     for h in hosts_db:
         F.write("{} {}\n".format(hosts_db[h].get('mgmtip', ''), h))
     F.close()
     
     ### SWITCHPORT INFO
-    F = open('debug/raw.get_switchport_status.json', 'w')
+    F = open(os.path.join(debug_folder, 'raw.get_switchport_status.json'), 'w')
     F.write(saoslist.get_switchport_status())
     F.close()
-    F = open('output/switchport-status.inventory.{}.csv'.format(today), 'w')
+    F = open(os.path.join(output_folder, 'switchport-status.inventory.{}.csv'.format(today)), 'w')
     for line in saoslist.report_switchport_status():
         #print(line)
         F.write("{}\n".format(",".join(line)))
     F.close()
     
     ### LLDP debug info
-    F = open('debug/raw.get_netjson_lldp.json', 'w')
+    F = open(os.path.join(debug_folder, 'raw.get_netjson_lldp.json'), 'w')
     F.write(saoslist.get_netjson_lldp())
     F.close()
 
     ### LOGICAL RING INFO
-    F = open('debug/raw.logical_ring_info.json', 'w')
+    F = open(os.path.join(debug_folder, 'raw.logical_ring_info.json'), 'w')
     F.write(saoslist.get_logical_ring_info())
     F.close()
-    F = open('output/logical-ringinfo.inventory.{}.csv'.format(today), 'w')
+    F = open(os.path.join(output_folder, 'logical-ringinfo.inventory.{}.csv'.format(today)), 'w')
     for line in saoslist.report_logical_ring_inventory():
         F.write("{}\n".format(",".join(line)))
     F.close()
 
     ### VIRTUAL RING INFO
-    F = open('debug/raw.virtual_ring_info.json', 'w')
+    F = open(os.path.join(debug_folder, 'raw.virtual_ring_info.json'), 'w')
     F.write(saoslist.get_virtual_ring_info())
     F.close()
-    F = open('output/virtual-ringinfo.inventory.{}.csv'.format(today), 'w')
+    F = open(os.path.join(output_folder, 'virtual-ringinfo.inventory.{}.csv'.format(today)), 'w')
     for line in saoslist.report_virtual_ring_inventory():
         F.write("{}\n".format(",".join(line)))
     F.close()
 
     ### VLAN INFO
-    F = open('debug/raw.vlan_info.json', 'w')
+    F = open(os.path.join(debug_folder, 'raw.vlan_info.json'), 'w')
     F.write(saoslist.get_vlan_info())
     F.close()
-    F = open('output/vlaninfo.inventory.{}.csv'.format(today), 'w')
+    F = open(os.path.join(output_folder, 'vlaninfo.inventory.{}.csv'.format(today)), 'w')
     for line in saoslist.report_vlan_inventory():
         F.write("{}\n".format(",".join(line)))
     F.close()
 
     ### SERVICE INFO
-    F = open('debug/raw.service_info.json', 'w')
+    F = open(os.path.join(debug_folder, 'raw.service_info.json'), 'w')
     F.write(saoslist.get_service_info())
     F.close()
-    F = open('output/services.inventory.{}.csv'.format(today), 'w')
+    F = open(os.path.join(output_folder, 'services.inventory.{}.csv'.format(today)), 'w')
     for line in saoslist.report_service_inventory():
         F.write("{}\n".format(",".join(line)))
     F.close()
 
     ### debug json per host
     for s in saoslist.parserlist:
-        F = open('debug/raw.{}.json'.format(s.model.host.hostname), 'w')
+        F = open(os.path.join(debug_folder, 'raw.{}.json'.format(s.model.host.hostname)), 'w')
         F.write(s.json())
         F.close()
     
@@ -362,6 +365,14 @@ if __name__ == "__main__":
     
     cmdargs = get_args(myconfig.CARRIERETHERNET_PARSER_CONFIG_FOLDER)
     SAOSDIR = cmdargs.config_dir
+    DBDIR = myconfig.CARRIERETHERNET_PARSER_DB_FOLDER
+
+    DEBUG_FOLDER = myconfig.CARRIERETHERNET_PARSER_DEBUG_FOLDER
+    OUTPUT_FOLDER = myconfig.CARRIERETHERNET_PARSER_OUTPUT_FOLDER
+    MAX_CONFIG_AGE = myconfig.CARRIERETHERNET_PARSER_MAX_CONFIG_AGE
+    MAX_PARSED_FILES = myconfig.CARRIERETHERNET_PARSER_MAX_PARSED_FILES
+
+
     #DEBUG = True if (cmdargs.debug or cmdargs.trace) else False
     #SAOSDIR = '/Users/mwallraf/dev/alfie/trops-carrierethernet-parser.git/test_configs/SDS/'
     
@@ -396,16 +407,18 @@ if __name__ == "__main__":
     logger.debug("SAOS configs: {}".format(saosconfigs))
     
     # start the main parser
-    max_parsed_files = 1200  # do not parse more then x files
-    max_config_age = 4      # do not parse files older than x days
+    #max_parsed_files = 1200  # do not parse more then x files
     config_filter = None    # if specified - only use configs matching the filter
 
     parser(configdir=SAOSDIR,
+           dbfile=os.path.join(DBDIR, "hosts.json"),
            configlist=saosconfigs, 
            debug=myconfig.DEBUG, 
-           stopafter=max_parsed_files, 
-           max_config_age_days=max_config_age, 
-           filefilter=config_filter)
+           stopafter=MAX_PARSED_FILES, 
+           max_config_age_days=MAX_CONFIG_AGE, 
+           filefilter=config_filter,
+           debug_folder=DEBUG_FOLDER,
+           output_folder=OUTPUT_FOLDER)
     
 
 

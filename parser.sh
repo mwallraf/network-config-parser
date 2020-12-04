@@ -30,7 +30,7 @@ readonly REQUIRED_TOOLS=()
 
 # Long Options. To expect an argument for an option, just place a : (colon)
 # after the proper option flag.
-readonly LONG_OPTS=(help version router-parser)
+readonly LONG_OPTS=(help version router-parser ces-parser)
 
 # Short Options. To expect an argument for an option, just place a : (colon)
 # after the proper option flag.
@@ -43,7 +43,7 @@ readonly SCRIPT_NAME=${0##*/}
 readonly ROUTER_PARSER_DIR="$SCRIPTDIR/router-parser"
 readonly ROUTER_PARSER="$ROUTER_PARSER_DIR/run.sh"
 readonly CARRIER_ETHERNET_PARSER_DIR="$SCRIPTDIR/carrierethernet-parser"
-readonly CARRIER_ETHERNET_PARSER="$CARRIER_ETHERNET_PARSER_DIR/run-carrierethernet-parser.sh"
+readonly CARRIER_ETHERNET_PARSER="$CARRIER_ETHERNET_PARSER_DIR/run.sh"
 
 # switch that decides if the router-processor script has to run
 declare RUN_ROUTER_PARSER=
@@ -71,6 +71,7 @@ ABOUT:
   Start config parser scripts, existing scripts:
   - router-parser = parse ios based router scripts and try to link configs
                     based on P2P ip addresses
+  - ces-parser = parse Ciena CAOS based carrier ethernet devices
 
 USAGE:
   $SCRIPT_NAME [options] <command>
@@ -79,6 +80,7 @@ OPTIONS:
   --help, -h              Alias help command
   --version, -v           Alias version command
   --router-parser         Start the router-parser script (default=no)
+  --ces-parser            Start the carrier ethernet parser script (default=no)
   --                      Denotes the end of the options.  Arguments after this
                           will be handled as parameters even if they start with
                           a '-'.
@@ -238,7 +240,7 @@ function main() {
       v|version)    version_command; exit 0; ;;
       h|help)       help_command ;;
       router-parser) RUN_ROUTER_PARSER=true ;;
-      carrier-ethernet-parser) RUN_CARRIER_ETHERNET_PARSER=true ;;
+      ces-parser) RUN_CARRIER_ETHERNET_PARSER=true ;;
       force)        FORCE=true ;;
       # Errors
       ::)   err "Unexpected argument to option '$OPTARG'"; exit 2; ;;

@@ -53,11 +53,22 @@ NETWORK_DISCOVERY_FILE="$ROUTER_PARSER_DIR/network-discovery/network-discovery.c
 
 #### CARRIERETHERNET-PARSER ENVIRONMENT VARIABLES ####
 
+CARRIERETHERNET_PARSER_DIR="carrierethernet-parser"
+
 # relative path to where the configs can be found
 CARRIERETHERNET_PARSER_CONFIG_FOLDER="configs"
 
 # relative path to the log folder
 CARRIERETHERNET_PARSER_LOG_FOLDER="logs"
+
+# relative path to the db folder
+CARRIERETHERNET_PARSER_DB_FOLDER="$CARRIERETHERNET_PARSER_DIR/db"
+
+# relative path to the debug folder
+CARRIERETHERNET_PARSER_DEBUG_FOLDER="$CARRIERETHERNET_PARSER_DIR/debug"
+
+# stop the script if there are more files
+MAX_PARSED_FILES=1200
 
 # filename of the log file
 CARRIERETHERNET_PARSER_LOGFILE="carrier-ethernet-parser.log"
