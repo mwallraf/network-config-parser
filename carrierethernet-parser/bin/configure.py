@@ -22,14 +22,19 @@ logging.trace = log_root
 # initialize variables, tak from environment if exists
 SCRIPTDIR = os.path.abspath(os.path.dirname(__file__))  ## This directory
 CARRIERETHERNET_PARSER_LOG_FOLDER = os.environ.get("CARRIERETHERNET_PARSER_LOG_FOLDER", "log")
+CARRIERETHERNET_PARSER_LOGFILE = os.environ.get("CARRIERETHERNET_PARSER_LOGFILE", "carrier-ethernet-parser")
 CARRIERETHERNET_PARSER_DIR = os.environ.get("CARRIERETHERNET_PARSER_DIR", SCRIPTDIR)
 
 # check that the logs folder exists
 try: 
     os.mkdir(CARRIERETHERNET_PARSER_LOG_FOLDER) 
 except OSError as error: 
-    print(error)
+    #print(error)
     pass
+
+# set the logging files
+logging.CARRIERETHERNET_PARSER_LOGFILE_MAIN = "{}/{}.log".format(CARRIERETHERNET_PARSER_LOG_FOLDER, CARRIERETHERNET_PARSER_LOGFILE)
+logging.CARRIERETHERNET_PARSER_LOGFILE_MOD = "{}/{}-mod.log".format(CARRIERETHERNET_PARSER_LOG_FOLDER, CARRIERETHERNET_PARSER_LOGFILE)
 
 # check that logging.config exists
 fileConfig('{}/bin/logging.conf'.format(CARRIERETHERNET_PARSER_DIR))

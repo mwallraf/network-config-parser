@@ -131,7 +131,7 @@ def get_args(default_config_dir="."):
 
 
 
-def append_hostname(saos, db_file="db/hosts.json"):
+def append_hostname(saos, db_file="db/hosts.json", filename=""):
     """
         Store hostname + mgmt IP in a json db db/hosts.json
         This can be used to generate a hosts file that is not dependant if parsing of a device fails or not
@@ -142,6 +142,10 @@ def append_hostname(saos, db_file="db/hosts.json"):
     hostname = saos.model.host.hostname
     chassisid = saos.model.host.chassisid
     mgmtip = saos.model.get_management_ip()
+
+    if not hostname:
+        logger.warning("found an invalid hostname in filename: {}".format(filename))
+        return
 
     ## read the hosts db
     try:
@@ -227,7 +231,7 @@ def parser(configdir="", configlist=[],
         count += 1
         ### append hostname + mgmt IP to the hosts DB
         ### keep track of historical hostnames because if parsing fails somehow then the hosts file will not be complete
-        append_hostname(saos, hosts_db_file)
+        append_hostname(saos, hosts_db_file, filename=s)
 
         # at the moment we skip parsing of 8700
         #if saos.model.system.hwtype and saos.model.system.hwtype is not "8700":
@@ -238,7 +242,7 @@ def parser(configdir="", configlist=[],
             #if config_age >= 5:
                 saoslist.append(saos)
             else:
-                logger.warn("SKIPPING OLD CONFIG: {}".format(configfile))
+                logger.warning("SKIPPING OLD CONFIG: {}".format(configfile))
             #print(">>>>>>>>>>>> config age = {}".format())
             #print(">>>>>>>>>>>> firstseen: {}".format(saos.model.firstseen))
             #print(">>>>>>>>>>>> lastseen: {}".format(saos.model.lastseen))
