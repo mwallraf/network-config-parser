@@ -1,0 +1,10 @@
+* virtual-ring report says that vlans do not match but this is because vlans may have missing naming or description between devices, check on vlan id instead of vlan name
+* add a check for inconsistent vlan names between devices
+* C-VLANS are not SVI interfaces usually so they are not created as a vlan on the SDS, add the C-VLAN manually in the vlans model
+* rplowner reporting is not working
+* SAS87 does not know about ring east-west termination or rplowner
+* virtual ring status: include warning instead of only errors
+* warnings about vlan name are calculated double in some cases
+!! * on 87xx the vlan+port link should be added
+* generate hosts file, keep track of last seen or something .. to avoid hosts not being parsed
+DONE * generate errors for ring name issues

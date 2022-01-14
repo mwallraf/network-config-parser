@@ -59,7 +59,7 @@ else
     echo "ERROR: output file is expected to have minimum $MINEXPECTEDLINES lines"    
 fi
 
-
+echo "script has finished"
 
 
 

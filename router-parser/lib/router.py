@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 
 from ciscoconfparse import CiscoConfParse
-import logging
+from logzero import logger as log
+import logzero
 import re
 #from netaddr import IPNetwork, IPAddress
 #from ipaddress import IPv4Network
@@ -18,13 +19,6 @@ from time import time
 ## v0.1f - 2017-04-12: add properties for CELLULAR
 
 
-class NullHandler(logging.Handler):
-    def emit(self, record):
-        pass
-
-log = logging.getLogger('findhost.router')
-h = NullHandler()
-log.addHandler(h)
 version = "v0.1g"
 
 class RouterFactory(object):
@@ -140,12 +134,14 @@ class Router(object):
     # for all the interfaces found, create an interface object
     # we use output of "show ip int brief" to make sure that we see the IP for DHCP interfaces and virtual interfaces
     def _parse_interfaces(self):
-        lines = self.parser.find_lines(r'^! INT: .*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|<unassigned>).*(up|down).*')
+        lines = self.parser.find_lines(r'^! INT: .*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|<unassigned>).*([Uu]p|[Dd]own).*')
         for l in lines:
             m = re.match(r'! INT: (.*) ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|<unassigned>)', l)
+            if not m:
+                log.warn("skip parsing, no interface and ip found for line: {}".format(l))
+                continue
             if not (m and len(m.groups())) > 0:
-                if not (m and len(m.groups())) > 0:
-                    log.warn("L3 interface found but unable to parse interface or ip address (%s)" % l)  
+                log.warn("L3 interface found but unable to parse interface or ip address (%s)" % l)  
             else:
                 _intf = m.groups()[0].strip()
                 _ip = m.groups()[1]
@@ -338,9 +334,9 @@ class interface(object):
     reDescr = re.compile(".*description (.*)")
     reBW = re.compile(" bandwidth ([0-9]+)")
     reDot1q = re.compile(".*encapsulation dot1Q ([0-9]+)", re.IGNORECASE)
-    reIp = re.compile(".*ip address (?P<IP>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+) (?P<MASK>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+) ?(?P<SEC>secondary)?")
+    reIp = re.compile(".*ip(?:v4)? address (?P<IP>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+) (?P<MASK>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+) ?(?P<SEC>secondary)?")
     rePolicy = re.compile(".*service-policy (?P<DIR>input|output) (?P<POL>.*)")
-    reVRF = re.compile(".*ip vrf forwarding (?P<VRF>.*)")
+    reVRF = re.compile("(.*ip vrf forwarding|.*vrf) (?P<VRF>.*)")
     reSpeed = re.compile(".*speed ([0-9]+)")
     # TODO: fix reDuplex regex
     reDuplex = re.compile("(?:duplex )?(.*)(?:\-duplex)?")
@@ -348,7 +344,7 @@ class interface(object):
     reAccessGroup = re.compile(".*ip access-group (?P<ACL>[^ ]+) (?P<DIR>[^ ]+).*")
     reNat = re.compile(".*ip nat (?P<DIR>inside|outside).*")
     reVDSL2SharedVlanPPP = re.compile(".*ppp pap sent-username (?P<USER>[^ ]+) password [0-9] (?P<PASS>[^ ]+)")
-    reDescrHostnameGuess = re.compile(".*[ -](?P<HOSTNAME>[^ -]{2,}-[^ -]{3,}-[^ -]{2,})")
+    reDescrHostnameGuess = re.compile(".*[ -](?:HN:)?(?P<HOSTNAME>[^ -]{2,}-[^ -]{3,}-[^ -]{2,})")
     reDescrVtRef = re.compile("VT[0-9]{5,6}")
     reIpHelper = re.compile(".*ip helper-address (?P<HELPER>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)")
     rePvc = re.compile(".*pvc (?P<PVC>[0-9]+\/[0-9]+)")
@@ -489,6 +485,7 @@ class interface(object):
             self._parse_interface_name(m.group('INTF'))
 
         for l in intfobj.children:
+            log.debug("** INTERFACE CONFIG LINE: {}".format(l))
             # description
             m = self.reDescr.match(l.text)
             if m:

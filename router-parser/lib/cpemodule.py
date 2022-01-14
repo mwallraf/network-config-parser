@@ -319,6 +319,7 @@ class CpeModule(object):
     ## add PE interface information to the cpe p2p information database
     def AddPeData(self):
         # go over each PE P2P object, add it to the CPE P2P object database if it doesn't exist
+        log.debug("pe_objects: {}".format(self.pe_objects))
         for p2p in self.pe_objects:
             if p2p not in self.p2p_objects:
                for pe_int in self.pe_objects[p2p]:
