@@ -127,11 +127,15 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-router-parser/configs/*.txt
-router-parser/configs/test/*.txt
-router-parser/configs/test_all/*.txt
+router-parser/configs/*
+carrierethernet-parser/configs/*
+router-parser/network-discovery/*
+router-parser/configs/test/*
+router-parser/configs/test_all/*
 router-parser/logs/*.log
 router-parser/log/*.log.*
-router-parser/output/*.csv
+router-parser/output/*
 router-parser/__remove__main.py
+router-parser/test.py
+router-parser/test.csv
 *.1
