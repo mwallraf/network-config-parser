@@ -4,8 +4,9 @@ from ciscoconfparse import CiscoConfParse
 from logzero import logger as log
 import logzero
 import re
-#from netaddr import IPNetwork, IPAddress
-#from ipaddress import IPv4Network
+
+# from netaddr import IPNetwork, IPAddress
+# from ipaddress import IPv4Network
 import ipaddress
 from time import time
 
@@ -14,7 +15,7 @@ from time import time
 ## v0.1b - 2016-02-02: add properties "FIRST SEEN", "SERIALNUMBER", "VDSL LINEPROFILE"
 ## v0.1c - 2016-03-16: update getVdslLineProfile() + add property "VDSL LINEPROFILE UPDATED"
 ## v0.1d - 2016-05-24: add tunnel interface on IPSEC routers for 4G
-## v0.1e - 2016-10-24: add property APN + SOFTWARE 
+## v0.1e - 2016-10-24: add property APN + SOFTWARE
 ## v0.1f - 2017-01-18: match VT regex on 5 or 6 digits, to make it work with new 6 digit VT's
 ## v0.1f - 2017-04-12: add properties for CELLULAR
 ## v0.1h - 2022-01-25: fix mismatches between ops/conf info about interfaces (uppercase/lowercase),
@@ -23,14 +24,15 @@ from time import time
 
 version = "v0.1h"
 
+
 class RouterFactory(object):
 
-    SUPPORTED_ROUTER_TYPES = [ "CPE", "PE" ]
+    SUPPORTED_ROUTER_TYPES = ["CPE", "PE"]
 
     @staticmethod
     def NewRouter(routertype="CPE", configfile=""):
         log.debug("===> new router object from config file: %s" % configfile)
-        rtr = ''
+        rtr = ""
         if routertype == "PE":
             return PERouter(configfile)
         elif routertype == "CPE":
@@ -38,7 +40,6 @@ class RouterFactory(object):
         else:
             log.error("unsupported router type: %s" % routertype)
             raise ValueError('Unsupported router type: "%s".' % routertype)
-
 
     @staticmethod
     def SupportedRouterTypes():
@@ -49,43 +50,60 @@ class RouterFactory(object):
 
 
 class Router(object):
-    #configdir = ""
-    TELNETOK = 1   # number of days since "lastseen" timestamp that we consider telnet to be working
+    # configdir = ""
+    TELNETOK = 1  # number of days since "lastseen" timestamp that we consider telnet to be working
 
     def __init__(self, configfile):
         self.props = {
-               'hostname': '',          # this is the actual hostname found on the device
-               'hostname_guess': '',    # this is the hostname found by "guessing" based on interface description
-               'mgmt_interfaces': [],   # list of all mgmt (loopback for IPVPN or WAN P2P for CI) interfaces
-               'p2p_interfaces': [],    # list of all WAN P2P interfaces
-               'ipsec_tunnel_interfaces': [], # list of all IPSEC Tunnel interfaces
-               'mobile_interfaces': [], # list of all mobile interfaces (ex. 3G, 4G)
-               'all_interfaces': [],
-               'all_vrfs': [],          # list of all VRF objects
-               'lastseen': '0',          # epoch timestamp when the config was last saved, router was last seen
-               'vendor': '',            # ex. CISCO | ONEACCESS
-               'hardware': '',          # ex. 888C | LBB4G
-               'function': '',          # ex. CPE | PE
-               'apn': '',               # APN configured on the router
-               'cellularimei': '',               # IMEI of sim card
-               'cellularimsi': '',               # IMSI of sim card
-               'cellularcellid': '',               # connected cell id
-               'cellularoperator': '',               # connected operator
-               'software': '',          # router software
-               'telnetok': False,       # assume telnet is ok if lastseen date is recent
-               'configfile': configfile, # name of the config file that is being parsed
-            }
-
+            "hostname": "",  # this is the actual hostname found on the device
+            "hostname_guess": "",  # this is the hostname found by "guessing" based on interface description
+            "mgmt_interfaces": [],  # list of all mgmt (loopback for IPVPN or WAN P2P for CI) interfaces
+            "p2p_interfaces": [],  # list of all WAN P2P interfaces
+            "ipsec_tunnel_interfaces": [],  # list of all IPSEC Tunnel interfaces
+            "mobile_interfaces": [],  # list of all mobile interfaces (ex. 3G, 4G)
+            "all_interfaces": [],
+            "all_vrfs": [],  # list of all VRF objects
+            "lastseen": "0",  # epoch timestamp when the config was last saved, router was last seen
+            "vendor": "",  # ex. CISCO | ONEACCESS
+            "hardware": "",  # ex. 888C | LBB4G
+            "function": "",  # ex. CPE | PE
+            "apn": "",  # APN configured on the router
+            "cellularimei": "",  # IMEI of sim card
+            "cellularimsi": "",  # IMSI of sim card
+            "cellularcellid": "",  # connected cell id
+            "cellularoperator": "",  # connected operator
+            "software": "",  # router software
+            "telnetok": False,  # assume telnet is ok if lastseen date is recent
+            "configfile": configfile,  # name of the config file that is being parsed
+        }
 
     # parse the running config of a router and get all info
     def ParseRunningConfig(self, config):
         self.parser = CiscoConfParse(str(config).splitlines())
-        #self.rtr._parse_running_config(parser)
+        # self.rtr._parse_running_config(parser)
 
         # generic parsers
-        self._parse_config_header(['HOSTNAME', 'VENDOR', 'LAST SEEN', 'HARDWARE', 'FUNCTION', 'FIRST SEEN', 'SERIALNUMBER', 'VDSL BW DOWNLOAD',
-                                    'VDSL BW UPLOAD', 'VDSL LINEPROFILE', 'VDSL LINEPROFILE UPDATED', 'APN', 'SOFTWARE',
-                                   'CELLULAR IMEI', 'CELLULAR IMSI', 'CELLULAR CELLID', 'CELLULAR OPERATOR' ])
+        self._parse_config_header(
+            [
+                "HOSTNAME",
+                "VENDOR",
+                "LAST SEEN",
+                "HARDWARE",
+                "FUNCTION",
+                "FIRST SEEN",
+                "SERIALNUMBER",
+                "VDSL BW DOWNLOAD",
+                "VDSL BW UPLOAD",
+                "VDSL LINEPROFILE",
+                "VDSL LINEPROFILE UPDATED",
+                "APN",
+                "SOFTWARE",
+                "CELLULAR IMEI",
+                "CELLULAR IMSI",
+                "CELLULAR CELLID",
+                "CELLULAR OPERATOR",
+            ]
+        )
         self._parse_vrfs()
         self._parse_interfaces()
 
@@ -94,7 +112,7 @@ class Router(object):
 
         # try to indicate if telnet has worked by checking the "last seen" time
         # let's assume that if it's more than 24h that telnet was not ok
-        self.props['telnetok'] = self._calculate_lastseen()
+        self.props["telnetok"] = self._calculate_lastseen()
 
     def GetProp(self, property):
         return self.props[property]
@@ -107,43 +125,62 @@ class Router(object):
 
     def _calculate_lastseen(self):
         now = int(time())
-        return (now - int(self.props['lastseen'])) < self.TELNETOK * 24 * 3600
+        return (now - int(self.props["lastseen"])) < self.TELNETOK * 24 * 3600
 
     ## parse header parameters which are generated in the config files by the backup script
     ## they all should start with ! <param>: <value>
     def _parse_config_header(self, keywords):
         for kw in keywords:
-            lines = self.parser.find_lines(r'^! %s:' % kw)
+            lines = self.parser.find_lines(r"^! %s:" % kw)
             if len(lines) > 0:
-                log.info("property found in header: %s = %s" % (kw, lines[0].split(": ")[-1]))
-                self.props[kw.replace(" ","").lower()] = lines[0].split(": ")[-1]
+                log.info(
+                    "property found in header: %s = %s" % (kw, lines[0].split(": ")[-1])
+                )
+                val = lines[0].split(": ")
+                if len(val) > 1:
+                    self.props[kw.replace(" ", "").lower()] = val[-1]
             else:
-                #if kw == 'VDSL LINEPROFILE' or kw == 'VDSL LINEPROFILE UPDATED' or kw == 'FIRST SEEN' or kw == 'SERIALNUMBER':
-                if kw in ('VDSL LINEPROFILE', 'VDSL LINEPROFILE UPDATED', 'FIRST SEEN', 'SERIALNUMBER', 'VDSL BW DOWNLOAD', 'VDSL BW UPLOAD'):
-                    self.props[kw.replace(" ","").lower()] = ""
+                # if kw == 'VDSL LINEPROFILE' or kw == 'VDSL LINEPROFILE UPDATED' or kw == 'FIRST SEEN' or kw == 'SERIALNUMBER':
+                if kw in (
+                    "VDSL LINEPROFILE",
+                    "VDSL LINEPROFILE UPDATED",
+                    "FIRST SEEN",
+                    "SERIALNUMBER",
+                    "VDSL BW DOWNLOAD",
+                    "VDSL BW UPLOAD",
+                ):
+                    self.props[kw.replace(" ", "").lower()] = ""
                 log.debug("property %s is not found in the config header" % kw)
-
 
     def GetAllVTFromRouter(self):
         allvt = []
-        for i in self.props['all_interfaces']:
-            [ allvt.append(vt) for vt in i.vt ]
-            [ allvt.append(vt) for o in self.props['all_interfaces'] for vt in o.vt ]
+        for i in self.props["all_interfaces"]:
+            [allvt.append(vt) for vt in i.vt]
+            [allvt.append(vt) for o in self.props["all_interfaces"] for vt in o.vt]
         return allvt
-
 
     # parse the output of "show ip int brief" to find all L3 interfaces
     # for all the interfaces found, create an interface object
     # we use output of "show ip int brief" to make sure that we see the IP for DHCP interfaces and virtual interfaces
     def _parse_interfaces(self):
-        lines = self.parser.find_lines(r'^! INT: .*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|<unassigned>).*([Uu]p|[Dd]own).*')
+        lines = self.parser.find_lines(
+            r"^! INT: .*\W([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|<unassigned>).*([Uu]p|[Dd]own).*"
+        )
         for l in lines:
-            m = re.match(r'! INT: +([\w\/\. ]+\w).*\W([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|<unassigned>).*(?:[yesYES]|[noNO])', l)
+            m = re.match(
+                r"! INT: +([\w\/\. \-]+\w).*\W([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|<unassigned>).*(?:[yesYES]|[noNO])",
+                l,
+            )
             if not m:
-                log.warn("skip parsing, no interface and ip found for line: {}".format(l))
+                log.warn(
+                    "skip parsing, no interface and ip found for line: {}".format(l)
+                )
                 continue
             if not (m and len(m.groups()) > 0):
-                log.warn("L3 interface found but unable to parse interface or ip address (%s)" % l)  
+                log.warn(
+                    "L3 interface found but unable to parse interface or ip address (%s)"
+                    % l
+                )
             else:
                 _intf = m.groups()[0].strip()
                 _ip = m.groups()[1]
@@ -159,20 +196,26 @@ class Router(object):
                 if _ip == "127.0.0.1":
                     log.debug("Skipping interface (%s) because of ip 127.0.0.1" % _intf)
                     continue
-                elif _ip == '<unassigned>' and "Tunnel" not in _intf:
-                    log.debug("Unassigned IP found for a none-tunnel interface - removing it")
+                elif _ip == "<unassigned>" and "Tunnel" not in _intf:
+                    log.debug(
+                        "Unassigned IP found for a none-tunnel interface - removing it"
+                    )
                     continue
-                elif _ip == '<unassigned>':
-                    _ip = ''
+                elif _ip == "<unassigned>":
+                    _ip = ""
                 ## skip Cisco NVI interfaces
                 if "NVI" in _intf:
-                    log.debug("Skipping interface (%s) because of interface name" % _intf)
+                    log.debug(
+                        "Skipping interface (%s) because of interface name" % _intf
+                    )
                     continue
                 if "Virtual-Access70." in _intf:
-                    log.debug("Skipping interface (%s) because of interface name" % _intf)
+                    log.debug(
+                        "Skipping interface (%s) because of interface name" % _intf
+                    )
                     continue
 
-                m = re.match(r'([^0-9]+)(.*)', _intf)
+                m = re.match(r"([^0-9]+)(.*)", _intf)
                 # interface may be truncated in "show ip int brief" output
                 if len(m.groups()) > 0:
                     _intf_name = m.groups()[0]
@@ -181,13 +224,21 @@ class Router(object):
                 try:
                     # in some OS versions the first letter does not always correspond between
                     # operational output and config output
-                    # caveat: do not do this for dialer interfaces because this messes up the 
+                    # caveat: do not do this for dialer interfaces because this messes up the
                     #         translation from dialer to virtual-template ppp
-                    if _intf_name.startswith("Dialer") or _intf_name.startswith("Virtual-Access"):
+                    if _intf_name.startswith("Dialer") or _intf_name.startswith(
+                        "Virtual-Access"
+                    ):
                         first_letter = _intf_name[0]
                     else:
-                        first_letter = "[{}{}]".format(_intf_name[0].lower(), _intf_name[0].upper())
-                    intf_cfg = self.parser.find_objects("^interface {}{}[^0-9]*{}( .*)?$".format(first_letter, _intf_name[1:], _intf_idx))
+                        first_letter = "[{}{}]".format(
+                            _intf_name[0].lower(), _intf_name[0].upper()
+                        )
+                    intf_cfg = self.parser.find_objects(
+                        "^interface {}{}[^0-9]*{}( .*)?$".format(
+                            first_letter, _intf_name[1:], _intf_idx
+                        )
+                    )
                     # intf_cfg = self.parser.find_objects("^interface {}[^0-9]*{}( .*)?$".format(_intf_name, _intf_idx))
                 except:
                     intf_cfg = []
@@ -199,109 +250,127 @@ class Router(object):
                         ## replace Dialer by "virtual-template ppp"
                         m = re.match("Dialer (.*)", _intf)
                         if m:
-                            log.debug("Trying to find a matching virtual-template interface")
-                            _intf_name = _intf_name.replace("Dialer ", "virtual-template ppp")
-                            intf_cfg = self.parser.find_objects("^%s[^0-9]*%s( .*)?$" % (_intf_name, _intf_idx))
+                            log.debug(
+                                "Trying to find a matching virtual-template interface"
+                            )
+                            _intf_name = _intf_name.replace(
+                                "Dialer ", "virtual-template ppp"
+                            )
+                            intf_cfg = self.parser.find_objects(
+                                "^%s[^0-9]*%s( .*)?$" % (_intf_name, _intf_idx)
+                            )
                             if len(intf_cfg) > 0:
-                                log.debug("Match found: substituted Dialer interface by %s" % _intf_name)
+                                log.debug(
+                                    "Match found: substituted Dialer interface by %s"
+                                    % _intf_name
+                                )
                                 DOCONTINUE = False
                                 continue
                         ## replace Virtual-Access by Virtual-Template
                         m = re.match("Virtual-Access[0-9]+", _intf)
                         if m:
-                            log.debug("Trying to find a matching Virtual-Template interface")
-                            _intf_name = _intf_name.replace("Virtual-Access", "Virtual-Template")
-                            intf_cfg = self.parser.find_objects("^interface %s[^0-9]*%s( .*)?$" % (_intf_name, _intf_idx))
+                            log.debug(
+                                "Trying to find a matching Virtual-Template interface"
+                            )
+                            _intf_name = _intf_name.replace(
+                                "Virtual-Access", "Virtual-Template"
+                            )
+                            intf_cfg = self.parser.find_objects(
+                                "^interface %s[^0-9]*%s( .*)?$"
+                                % (_intf_name, _intf_idx)
+                            )
                             if len(intf_cfg) > 0:
-                                log.debug("Match found: substituted Virtual-Access interface by %s" % _intf_name)
+                                log.debug(
+                                    "Match found: substituted Virtual-Access interface by %s"
+                                    % _intf_name
+                                )
                                 DOCONTINUE = False
                                 continue
                             else:
-                                log.debug("No substitute found for %s so assuming it's generated by a dialer interface" % _intf)
+                                log.debug(
+                                    "No substitute found for %s so assuming it's generated by a dialer interface"
+                                    % _intf
+                                )
                                 DOCONTINUE = False
                                 continue
                         DOCONTINUE = False
                         log.error("L3 interface found but no matching config (%s)" % l)
-                            
-                            
-                elif len(intf_cfg) > 1:
-                    log.warn("L3 interface found with multiple matches in the config (%s)" % l)
-                for obj in intf_cfg:
-                    intf = interface(obj, self, _ip) 
-                    if intf.isMgmt():
-                        self.props['mgmt_interfaces'].append(intf)
-                    elif intf.isP2P():
-                        self.props['p2p_interfaces'].append(intf)
-                    elif intf.isIPSEC():
-                        self.props['ipsec_tunnel_interfaces'].append(intf)
-                    elif intf.isMOBILE():
-                        self.props['mobile_interfaces'].append(intf)
-                    self.props['all_interfaces'].append(intf)
 
-            
+                elif len(intf_cfg) > 1:
+                    log.warn(
+                        "L3 interface found with multiple matches in the config (%s)"
+                        % l
+                    )
+                for obj in intf_cfg:
+                    intf = interface(obj, self, _ip)
+                    if intf.isMgmt():
+                        self.props["mgmt_interfaces"].append(intf)
+                    elif intf.isP2P():
+                        self.props["p2p_interfaces"].append(intf)
+                    elif intf.isIPSEC():
+                        self.props["ipsec_tunnel_interfaces"].append(intf)
+                    elif intf.isMOBILE():
+                        self.props["mobile_interfaces"].append(intf)
+                    self.props["all_interfaces"].append(intf)
 
     def _parse_vrfs(self):
         # get all VRF config
         all_vrfs = self.parser.find_objects("^ip vrf ")
         for obj in all_vrfs:
             vrf = VRF(obj, self)
-            self.props['all_vrfs'].append(vrf)
+            self.props["all_vrfs"].append(vrf)
 
     # part of config header
-    #def _parse_apn_4g(self):
+    # def _parse_apn_4g(self):
     #    # check for the 4G APN FIXB2B4G.BE
     #    apn = self.parser.find_objects("apn FIXB2B4G.BE")
     #    if len(apn) > 0:
     #        self.props['apn'] = "FIXB2B4G.BE"
-        
 
     def getP2PInterfaces(self, includeIPSEC=True, includeMOBILE=False):
-        rc = self.props['p2p_interfaces']
+        rc = self.props["p2p_interfaces"]
         if includeIPSEC:
-            rc = rc + self.props['ipsec_tunnel_interfaces']
+            rc = rc + self.props["ipsec_tunnel_interfaces"]
         if includeMOBILE:
-            rc = rc + self.props['mobile_interfaces']
+            rc = rc + self.props["mobile_interfaces"]
         return rc
 
     def getMgmtInterfaces(self):
-        return self.props['mgmt_interfaces']
+        return self.props["mgmt_interfaces"]
 
     def getIpsecTunnelInterfaces(self):
-        return self.props['ipsec_tunnel_interfaces']
+        return self.props["ipsec_tunnel_interfaces"]
 
     def getMobileInterfaces(self):
-        return self.props['mobile_interfaces']
+        return self.props["mobile_interfaces"]
 
     def getLastSeen(self):
-        return self.props['lastseen']
+        return self.props["lastseen"]
 
     def getFirstSeen(self):
-        return self.props['firstseen']
+        return self.props["firstseen"]
 
     def getSerialNumber(self):
-        return self.props['serialnumber']
+        return self.props["serialnumber"]
 
     def getVdslLineProfile(self):
-        vdsl = { 'LP': '', 'BW_DOWN': '', 'BW_UP': '' }
-        m = re.match("(LP[0-9]+) \((.*)\/(.*)\)", self.props['vdsllineprofile'])
+        vdsl = {"LP": "", "BW_DOWN": "", "BW_UP": ""}
+        m = re.match("(LP[0-9]+) \((.*)\/(.*)\)", self.props["vdsllineprofile"])
         if m:
-            vdsl['LP'] = m.group(1)
-            vdsl['BW_DOWN'] = m.group(2)
-            vdsl['BW_UP'] = m.group(3)
+            vdsl["LP"] = m.group(1)
+            vdsl["BW_DOWN"] = m.group(2)
+            vdsl["BW_UP"] = m.group(3)
         return vdsl
-        #return self.props['vdsllineprofile']
-
-
+        # return self.props['vdsllineprofile']
 
 
 class PERouter(Router):
-
     def __init__(self, configfile):
-        log.debug('new PE router object')
+        log.debug("new PE router object")
         Router.__init__(self, configfile)
 
     def _parse_running_config(self):
-        log.debug('parse PE specific config')
+        log.debug("parse PE specific config")
 
     def getType(self):
         return "PE"
@@ -313,15 +382,13 @@ class PERouter(Router):
         return False
 
 
-
 class CPERouter(Router):
-
     def __init__(self, configfile):
-        log.debug('new CPE router object')
+        log.debug("new CPE router object")
         Router.__init__(self, configfile)
 
     def _parse_running_config(self):
-        log.debug('parse CPE specific config')
+        log.debug("parse CPE specific config")
 
     def getType(self):
         return "CPE"
@@ -333,7 +400,6 @@ class CPERouter(Router):
         return True
 
 
-
 class interface(object):
 
     # STATIC variables
@@ -343,13 +409,15 @@ class interface(object):
     NAT_BOTH = 3
 
     ## precompiled regex
-    #reIntf = re.compile(".*interface ([^ ]+)")
-    #reIntf = re.compile("(interface|virtual-template) (?P<INTF>[^0-9]+[0-9][^ ]*).*")
+    # reIntf = re.compile(".*interface ([^ ]+)")
+    # reIntf = re.compile("(interface|virtual-template) (?P<INTF>[^0-9]+[0-9][^ ]*).*")
     reIntf = re.compile("(?:interface )?(?P<INTF>[^0-9]+[0-9][^ ]*).*")
     reDescr = re.compile(".*description (.*)")
     reBW = re.compile(" bandwidth ([0-9]+)")
     reDot1q = re.compile(".*encapsulation dot1Q ([0-9]+)", re.IGNORECASE)
-    reIp = re.compile(".*ip(?:v4)? address (?P<IP>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+) (?P<MASK>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+) ?(?P<SEC>secondary)?")
+    reIp = re.compile(
+        ".*ip(?:v4)? address (?P<IP>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+) (?P<MASK>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+) ?(?P<SEC>secondary)?"
+    )
     rePolicy = re.compile(".*service-policy (?P<DIR>input|output) (?P<POL>.*)")
     reVRF = re.compile("(.*ip vrf forwarding|.*vrf) (?P<VRF>.*)")
     reSpeed = re.compile(".*speed ([0-9]+)")
@@ -358,32 +426,42 @@ class interface(object):
     reStandby = re.compile(".*standby (?P<ID>[0-9]+) (?P<CMD>[^ ]+) (?P<PARM>[^ ]+)$")
     reAccessGroup = re.compile(".*ip access-group (?P<ACL>[^ ]+) (?P<DIR>[^ ]+).*")
     reNat = re.compile(".*ip nat (?P<DIR>inside|outside).*")
-    reVDSL2SharedVlanPPP = re.compile(".*ppp pap sent-username (?P<USER>[^ ]+) password [0-9] (?P<PASS>[^ ]+)")
+    reVDSL2SharedVlanPPP = re.compile(
+        ".*ppp pap sent-username (?P<USER>[^ ]+) password [0-9] (?P<PASS>[^ ]+)"
+    )
     reVDSL2SharedVlanPPPuser = re.compile(" *username +(?P<USER>VT\d+_MAIN.*)")
     reVDSL2SharedVlanPPPpassword = re.compile(" *password +(?P<PASS>MAIN_.*_PPP)")
-    reDescrHostnameGuess = re.compile(".*[ -](?:HN:)?(?P<HOSTNAME>[^ -]{2,}-[^ -]{3,}-[^ -]{2,})")
+    reDescrHostnameGuess = re.compile(
+        ".*[ -](?:HN:)?(?P<HOSTNAME>[^ -]{2,}-[^ -]{3,}-[^ -]{2,})"
+    )
     reDescrVtRef = re.compile("VT[0-9]{5,6}")
-    reIpHelper = re.compile(".*ip helper-address (?P<HELPER>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)")
+    reIpHelper = re.compile(
+        ".*ip helper-address (?P<HELPER>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)"
+    )
     rePvc = re.compile(".*pvc (?P<PVC>[0-9]+\/[0-9]+)")
     reTunnel = re.compile(" +tunnel ")
     reTunnelVrf = re.compile(" +tunnel vrf (?P<VRF>\S+)")
     reTunnelKey = re.compile(" +tunnel key (?P<KEY>\S+)")
     reTunnelSource = re.compile(" +tunnel source (?P<SRC>\S+)")
     reTunnelDestination = re.compile(" +tunnel destination (?P<DST>\S+)")
-    reTunnelIpsecProfile = re.compile(" +tunnel protection ipsec profile (?P<PROFILE>\S+)")
+    reTunnelIpsecProfile = re.compile(
+        " +tunnel protection ipsec profile (?P<PROFILE>\S+)"
+    )
     reTunnelHubIp = re.compile(" +ip nhrp nhs (?P<IP>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)")
 
     # returns True if the interface is a management interface
     def isMgmt(self):
-        return (self.product_obj.type == 'LOOPBACK') and (self.product_obj.function == 'MGMT')
+        return (self.product_obj.type == "LOOPBACK") and (
+            self.product_obj.function == "MGMT"
+        )
 
     # returns True if the interface is a P2P interface
     def isP2P(self):
-        return (self.product_obj.type == 'P2P') and (self.product_obj.function == 'WAN')
+        return (self.product_obj.type == "P2P") and (self.product_obj.function == "WAN")
 
     # return IPSEC P2P interfaces
     def isIPSEC(self):
-        return self.product_obj.function == 'IPSEC'
+        return self.product_obj.function == "IPSEC"
 
     # return MOBILE IP inteface
     def isMOBILE(self):
@@ -392,59 +470,69 @@ class interface(object):
     # conf = cisco conf parsers interface object
     # p = parent object (= router)
     def __init__(self, conf, p, ip):
-        log.debug('new interface object for router %s' % p.GetProp('hostname'))
-        self.intf = ""           # ex. FastEthernet0/0  (like found in the config)
-        self.ip = ip             # ex. 10.10.10.10/24
-        self.network = ""        # network address of the ip  (ex. 10.10.10.0)
-        self.mask = ""           # mask of the ip ("ex. 255.255.255.0)
-        self.secip = []          # secondary ips, ex. [ '1.2.2.2/24' ]
-        #self.function = ""       # AUTO POPULATED: MGMT/LAN/WAN/OTHER
-        #self.type = ""           # AUTO POPULATED: p2p/loopback/ipsec/ipsec-mgmt/other
-        #self.product = ""        # AUTO POPULATED: IPVPN/CI/IP-UPLINK
-        self.product_obj = Product() # store the product related to this interface
-        #self.transmission = ""   # ATM/Ethernet/VDSL/Explore/3G/4G/internet ...
-        self.descr = ""          # int description
-        self.hostname_guess = "" # guess cpe hostname based on interface description
-        self.pe_guess = ""       # guess the pe hostname base on the interface description
+        log.debug("new interface object for router %s" % p.GetProp("hostname"))
+        self.intf = ""  # ex. FastEthernet0/0  (like found in the config)
+        self.ip = ip  # ex. 10.10.10.10/24
+        self.network = ""  # network address of the ip  (ex. 10.10.10.0)
+        self.mask = ""  # mask of the ip ("ex. 255.255.255.0)
+        self.secip = []  # secondary ips, ex. [ '1.2.2.2/24' ]
+        # self.function = ""       # AUTO POPULATED: MGMT/LAN/WAN/OTHER
+        # self.type = ""           # AUTO POPULATED: p2p/loopback/ipsec/ipsec-mgmt/other
+        # self.product = ""        # AUTO POPULATED: IPVPN/CI/IP-UPLINK
+        self.product_obj = Product()  # store the product related to this interface
+        # self.transmission = ""   # ATM/Ethernet/VDSL/Explore/3G/4G/internet ...
+        self.descr = ""  # int description
+        self.hostname_guess = ""  # guess cpe hostname based on interface description
+        self.pe_guess = ""  # guess the pe hostname base on the interface description
         ### TODO: refer to the VRF object
-        self.vrf = ""            # VRF the interface belongs to
-        self.policy_in = ""      # QOS input policy
-        self.policy_out = ""     # QOS output policy
-        self.intfbw = ""         # bandwidth statement
-        self.vlan = ""           # vlan id (either from "interface vlan <id>" or dot1q value)
-        self.subint = ""         # subinterface (ex. Gi3/0.112)
-        self.speed = ""          # configured speed (10/100/1000)
-        self.duplex = ""         # configured duplex (auto/half/full)
-        self.standby = {}        # standby{'groupid': { 'ip', 'priority' }}
-        self.acl_in = ""         # ACL inbound
-        self.acl_out = ""        # ACL outbound
-        #self.nat_in = False      # inbound NAT configured
-        #self.nat_out = False     # outbound NAT configurd
-        self.nat = 0             # nat is enabled (0 = not, 1 = inbound, 2 = outbound, 3 = both)
-        self.vdsl2 = {}          # { 'type': shared|dedicated, 'ppp_user': "", 'ppp_pass': "" }
-        self.rtr = ""         # parent router object
-        self.pe_intf_objects = []    # list of corresponding PE interface objects
-        self.vt = []            # VT reference for this interface
-        self.iphelpers= []      # IP Helper addresses
-        self.pvc = ""           # atm pvc  2/33
-        self.tunnel = {         # tunnel details
-            'vrf': '',          # tunnel vrf UNTRUST
-            'key': '',          # tunnel key 1508
-            'source': '',       # tunnel source Dialer1
-            'destination': '',  # tunnel destination 94.105.139.186
-            'ipsecprofile': '', # tunnel protection ipsec profile PSK-ipsec-prof
-            'hubip': '',        # ip nhrp nhs 192.0.0.254
+        self.vrf = ""  # VRF the interface belongs to
+        self.policy_in = ""  # QOS input policy
+        self.policy_out = ""  # QOS output policy
+        self.intfbw = ""  # bandwidth statement
+        self.vlan = ""  # vlan id (either from "interface vlan <id>" or dot1q value)
+        self.subint = ""  # subinterface (ex. Gi3/0.112)
+        self.speed = ""  # configured speed (10/100/1000)
+        self.duplex = ""  # configured duplex (auto/half/full)
+        self.standby = {}  # standby{'groupid': { 'ip', 'priority' }}
+        self.acl_in = ""  # ACL inbound
+        self.acl_out = ""  # ACL outbound
+        # self.nat_in = False      # inbound NAT configured
+        # self.nat_out = False     # outbound NAT configurd
+        self.nat = 0  # nat is enabled (0 = not, 1 = inbound, 2 = outbound, 3 = both)
+        self.vdsl2 = {}  # { 'type': shared|dedicated, 'ppp_user': "", 'ppp_pass': "" }
+        self.rtr = ""  # parent router object
+        self.pe_intf_objects = []  # list of corresponding PE interface objects
+        self.vt = []  # VT reference for this interface
+        self.iphelpers = []  # IP Helper addresses
+        self.pvc = ""  # atm pvc  2/33
+        self.tunnel = {  # tunnel details
+            "vrf": "",  # tunnel vrf UNTRUST
+            "key": "",  # tunnel key 1508
+            "source": "",  # tunnel source Dialer1
+            "destination": "",  # tunnel destination 94.105.139.186
+            "ipsecprofile": "",  # tunnel protection ipsec profile PSK-ipsec-prof
+            "hubip": "",  # ip nhrp nhs 192.0.0.254
         }
 
-        self.rtr = p;           # parent router object where the interface belongs to
+        self.rtr = p
+        # parent router object where the interface belongs to
 
         # parse the interface config
         self.parse(conf)
         # find initial product based on IP address, to determine interface type
-        #self._find_product_by_ip()
+        # self._find_product_by_ip()
         self.UpdateProductInfo()
-        
-        log.debug("-- summary for '%s': product=%s, function=%s, type=%s, transmission=%s" % (self.intf, self.product_obj.product, self.product_obj.function, self.product_obj.type, self.product_obj.transmission))
+
+        log.debug(
+            "-- summary for '%s': product=%s, function=%s, type=%s, transmission=%s"
+            % (
+                self.intf,
+                self.product_obj.product,
+                self.product_obj.function,
+                self.product_obj.type,
+                self.product_obj.transmission,
+            )
+        )
 
     ## returns what is supposed to be a unique key for this interface/product
     ## for regular P2P interfaces the P2P network address should be unique
@@ -453,28 +541,34 @@ class interface(object):
         id = self.network
         if self.isIPSEC():
             # for tunnels with tunnel key
-            if self.tunnel['key']:
-                id = "%s-%s" % (id, self.tunnel['key'])
+            if self.tunnel["key"]:
+                id = "%s-%s" % (id, self.tunnel["key"])
             # otherwise if function-source-destination (for PE) or function-destination-source
-            elif self.tunnel['source'] and self.tunnel['destination']:
+            elif self.tunnel["source"] and self.tunnel["destination"]:
                 if self.rtr.isCPE():
-                    id = "%s-%s-%s" % ('tunnel', self.tunnel['destination'], self.tunnel['source'])
+                    id = "%s-%s-%s" % (
+                        "tunnel",
+                        self.tunnel["destination"],
+                        self.tunnel["source"],
+                    )
                 else:
-                    id = "%s-%s-%s" % ('tunnel', self.tunnel['source'], self.tunnel['destination'])
-                
-        return id
+                    id = "%s-%s-%s" % (
+                        "tunnel",
+                        self.tunnel["source"],
+                        self.tunnel["destination"],
+                    )
 
+        return id
 
     ## Procedure to override Product info based on extra parameters
     ## this should could after all the info about the interface, router, PE is known
     def UpdateProductInfo(self):
         self.product_obj.ProductByInterface(self.intf)
         self.product_obj.ProductByIp(self.ip)
-        #self._find_product_by_pe_interface()
+        # self._find_product_by_pe_interface()
         # override automatic found product info
-        if 'ppp_user' in self.vdsl2:
+        if "ppp_user" in self.vdsl2:
             self.product_obj.UpdateProduct("transmission", "VDSL", "'VDSL2 user info'")
-
 
     ## try to determine the product or interface type based on pe interface
     ## only needed for PE to PE connections so skip it if this is a CPE interace
@@ -484,13 +578,11 @@ class interface(object):
             log.debug("CPE interface - no need to guess product based on PE interface")
             return
         else:
-            self.product_obj.ProductByPEIntf(self.rtr.GetProp('hostname'), self.intf)
-            #if not p: return
-            #self.product = p['product']
-            #self.type = p['type']
-            #self.function = p['function']
-
-
+            self.product_obj.ProductByPEIntf(self.rtr.GetProp("hostname"), self.intf)
+            # if not p: return
+            # self.product = p['product']
+            # self.type = p['type']
+            # self.function = p['function']
 
     ## main parser function
     def parse(self, intfobj):
@@ -498,8 +590,8 @@ class interface(object):
         if not (m and len(m.groups()) > 0):
             log.error("interface was not found in '%s'" % intfobj.text)
         else:
-            #self._parse_interface_name(m.groups()[0])
-            self._parse_interface_name(m.group('INTF'))
+            # self._parse_interface_name(m.groups()[0])
+            self._parse_interface_name(m.group("INTF"))
 
         for l in intfobj.children:
             log.debug("** INTERFACE CONFIG LINE: {}".format(l))
@@ -521,7 +613,7 @@ class interface(object):
             # VRF
             m = self.reVRF.match(l.text)
             if m:
-                self._parse_vrf(m.group('VRF'))
+                self._parse_vrf(m.group("VRF"))
                 continue
             # service-policy
             m = self.rePolicy.match(l.text)
@@ -539,8 +631,8 @@ class interface(object):
                 self._parse_speed(m.group(1))
                 continue
             # interface duplex
-            #m = self.reDuplex.match(l.text)
-            #if m:
+            # m = self.reDuplex.match(l.text)
+            # if m:
             #    self._parse_duplex(m.group(1))
             #    continue
             # HSRP standby
@@ -594,102 +686,115 @@ class interface(object):
         # inside the virtual-template (IP is obtained dynamically)
         # In this case we will assume that the received IP is a /30 and we recalculate
         # the ip address information here
-        if self.ip and self.vdsl2.get('ppp_user', None) and not self.network:
-            log.debug("IP subnet {}/30 is assumed because VDSL PPP ip was received dynamically".format(self.ip))
+        if self.ip and self.vdsl2.get("ppp_user", None) and not self.network:
+            log.debug(
+                "IP subnet {}/30 is assumed because VDSL PPP ip was received dynamically".format(
+                    self.ip
+                )
+            )
             calculated_ip = "ip address {} 255.255.255.252".format(self.ip)
             m = self.reIp.match(calculated_ip)
             if m:
                 self._parse_ipaddr(calculated_ip, m)
 
-
     ## parse ip nhrp info
     def _parse_nhrp_hubip(self, m):
-        self.tunnel['hubip'] = m.group('IP')
-        log.debug("--> tunnel hub ip found: %s" % m.group('IP'))
-
+        self.tunnel["hubip"] = m.group("IP")
+        log.debug("--> tunnel hub ip found: %s" % m.group("IP"))
 
     ## parse tunnel info
     def _parse_tunnel(self, line):
         m = self.reTunnelVrf.match(line)
         if m:
-            self.tunnel['vrf'] = m.group('VRF')
-            log.debug("--> tunnel vrf found: %s" % m.group('VRF'))
+            self.tunnel["vrf"] = m.group("VRF")
+            log.debug("--> tunnel vrf found: %s" % m.group("VRF"))
             return
         m = self.reTunnelKey.match(line)
         if m:
-            self.tunnel['key'] = m.group('KEY')
-            log.debug("--> tunnel key found: %s" % m.group('KEY'))
+            self.tunnel["key"] = m.group("KEY")
+            log.debug("--> tunnel key found: %s" % m.group("KEY"))
             return
         m = self.reTunnelSource.match(line)
         if m:
-            self.tunnel['source'] = m.group('SRC')
-            log.debug("--> tunnel source found: %s" % m.group('SRC'))
+            self.tunnel["source"] = m.group("SRC")
+            log.debug("--> tunnel source found: %s" % m.group("SRC"))
             return
         m = self.reTunnelDestination.match(line)
         if m:
-            self.tunnel['destination'] = m.group('DST')
-            log.debug("--> tunnel destination found: %s" % m.group('DST'))
+            self.tunnel["destination"] = m.group("DST")
+            log.debug("--> tunnel destination found: %s" % m.group("DST"))
             return
         m = self.reTunnelIpsecProfile.match(line)
         if m:
-            self.tunnel['ipsecprofile'] = m.group('PROFILE')
-            log.debug("--> tunnel ipsec profile found: %s" % m.group('PROFILE'))
+            self.tunnel["ipsecprofile"] = m.group("PROFILE")
+            log.debug("--> tunnel ipsec profile found: %s" % m.group("PROFILE"))
             return
-
-
-
 
     ## parse PVC
     def _parse_pvc(self, m):
-        self.pvc = m.group('PVC')
-        log.debug("--> PVC found: %s" % m.group('PVC'))
+        self.pvc = m.group("PVC")
+        log.debug("--> PVC found: %s" % m.group("PVC"))
 
     ## parse IP Helpers
     def _parse_iphelper(self, m):
-        self.iphelpers.append(m.group('HELPER'))
-        log.debug("--> IP Helper address found: %s" % (m.group('HELPER')))
+        self.iphelpers.append(m.group("HELPER"))
+        log.debug("--> IP Helper address found: %s" % (m.group("HELPER")))
 
     ## parse VDSL2 shared vlan ppp
     def _parse_vdls2_shared_ppp(self, text, m):
-        self.vdsl2['ppp_user'] = m.group('USER')
-        self.vdsl2['ppp_pass'] = m.group('PASS')
-        log.debug("--> VDLS2 shared vlan PPP found: %s (%s)" % (self.vdsl2['ppp_user'], self.vdsl2['ppp_pass']))
+        self.vdsl2["ppp_user"] = m.group("USER")
+        self.vdsl2["ppp_pass"] = m.group("PASS")
+        log.debug(
+            "--> VDLS2 shared vlan PPP found: %s (%s)"
+            % (self.vdsl2["ppp_user"], self.vdsl2["ppp_pass"])
+        )
 
     ## parse VDSL2 shared vlan ppp username
     def _parse_vdls2_shared_ppp_user(self, text, m):
-        self.vdsl2['ppp_user'] = m.group('USER')
-        log.debug("--> VDLS2 shared vlan PPP username found: {}".format(self.vdsl2['ppp_user']))
+        self.vdsl2["ppp_user"] = m.group("USER")
+        log.debug(
+            "--> VDLS2 shared vlan PPP username found: {}".format(
+                self.vdsl2["ppp_user"]
+            )
+        )
 
     ## parse VDSL2 shared vlan ppp password
     def _parse_vdls2_shared_ppp_password(self, text, m):
-        self.vdsl2['ppp_pass'] = m.group('PASS')
-        log.debug("--> VDLS2 shared vlan PPP password found: {}".format(self.vdsl2['ppp_pass']))
+        self.vdsl2["ppp_pass"] = m.group("PASS")
+        log.debug(
+            "--> VDLS2 shared vlan PPP password found: {}".format(
+                self.vdsl2["ppp_pass"]
+            )
+        )
 
     ## parse NAT
     def _parse_nat(self, text, m):
-        if m.group('DIR') == 'inside':
+        if m.group("DIR") == "inside":
             self.nat = self.nat | self.NAT_IN
-            #self.nat_in = True
+            # self.nat_in = True
         else:
-            #self.nat_out = True
+            # self.nat_out = True
             self.nat = self.nat | self.NAT_OUT
         log.debug("--> NAT found: %s" % self.nat)
 
     ## parse ACL access-group
     def _parse_access_group(self, text, m):
-        if m.group('DIR') == 'in':
-            self.acl_in = m.group('ACL')
+        if m.group("DIR") == "in":
+            self.acl_in = m.group("ACL")
             log.debug("--> ACL INBOUND found: %s" % self.acl_in)
         else:
-            self.acl_out = m.group('ACL')
+            self.acl_out = m.group("ACL")
             log.debug("--> ACL OUTBOUND found: %s" % self.acl_out)
 
     ## parse HSRP standby group
     def _parse_standby(self, text, m):
-        if not m.group('ID') in self.standby:
-            self.standby[m.group('ID')] = {}
-        self.standby[m.group('ID')][m.group('CMD')] = m.group('PARM')
-        log.debug("--> HSRP line found: id=%s cmd=%s parm=%s" % (m.group('ID'), m.group('CMD'), m.group('PARM')))
+        if not m.group("ID") in self.standby:
+            self.standby[m.group("ID")] = {}
+        self.standby[m.group("ID")][m.group("CMD")] = m.group("PARM")
+        log.debug(
+            "--> HSRP line found: id=%s cmd=%s parm=%s"
+            % (m.group("ID"), m.group("CMD"), m.group("PARM"))
+        )
 
     ## parse interface duplex
     def _parse_duplex(self, text):
@@ -708,11 +813,11 @@ class interface(object):
 
     ## parse service-policy
     def _parse_service_policy(self, text, m):
-        if m.group('DIR') == 'input':
-            self.policy_in = m.group('POL')
+        if m.group("DIR") == "input":
+            self.policy_in = m.group("POL")
             log.debug("--> INPUT QOS Policy found: %s" % self.policy_in)
         else:
-            self.policy_out = m.group('POL')
+            self.policy_out = m.group("POL")
             log.debug("--> OUTPUT QOS Policy found: %s" % self.policy_out)
 
     ## parse VRF info
@@ -722,12 +827,12 @@ class interface(object):
 
     ## parse IP addresses
     def _parse_ipaddr(self, text, m):
-        #print(m.group('IP'), m.group('MASK'))
-        #net = IPv4Network("%s/%s" % (m.group('IP'), m.group('MASK')))
-        net = ipaddress.ip_interface("{}/{}".format(m.group('IP'), m.group('MASK')))
+        # print(m.group('IP'), m.group('MASK'))
+        # net = IPv4Network("%s/%s" % (m.group('IP'), m.group('MASK')))
+        net = ipaddress.ip_interface("{}/{}".format(m.group("IP"), m.group("MASK")))
         log.debug("--> ip address found:")
         ip = "%s/%s" % (net.ip, net.network.prefixlen)
-        if not m.group('SEC'):
+        if not m.group("SEC"):
             self.ip = ip
             self.network = net.network
             self.mask = net.netmask
@@ -737,8 +842,6 @@ class interface(object):
         else:
             self.secip.append(ip)
             log.debug("----> SECONDARY IP: %s" % ip)
-
-
 
     ## parse the interface name (FastEthernet0/0, ATM0.200, ...)
     def _parse_interface_name(self, text):
@@ -762,7 +865,7 @@ class interface(object):
         ## try to find hostname in description
         m = re.match(self.reDescrHostnameGuess, text)
         if m:
-            h = m.group('HOSTNAME')
+            h = m.group("HOSTNAME")
             if self.rtr.isCPE():
                 self.pe_guess = h
             else:
@@ -774,12 +877,11 @@ class interface(object):
             self.vt = m
             log.debug("--> found VT references in description: %s" % m)
 
-
     ## get all the VT references based on the PE objects
     def GetVTFromPEInterfaces(self):
         allvt = []
-        #[ allvt.append(o.vt) for o in self.pe_intf_objects ]
-        [ allvt.append(vt) for o in self.pe_intf_objects  for vt in o.vt ]
+        # [ allvt.append(o.vt) for o in self.pe_intf_objects ]
+        [allvt.append(vt) for o in self.pe_intf_objects for vt in o.vt]
         return allvt
 
     ## parse interface bandwidth
@@ -787,134 +889,194 @@ class interface(object):
         self.intfbw = text
         log.debug("--> bandwidth statement: %s" % self.intfbw)
 
-
     ## add PE interface object
     def add_pe_intf(self, obj):
         ## TODO: check for duplicates
         self.pe_intf_objects.append(obj)
-        log.debug("---> ADD PE data to CPE interface object: network=%s, PE=%s" % (self.network, obj.rtr.GetProp('hostname')))
+        log.debug(
+            "---> ADD PE data to CPE interface object: network=%s, PE=%s"
+            % (self.network, obj.rtr.GetProp("hostname"))
+        )
         ## update the hostname_guess value (just overwrite it every time a value is found)
         if obj.hostname_guess:
-            log.debug("---> OVERRIDE HOSTNAME_GUESS value: old=%s, new=%s" % (self.hostname_guess, obj.hostname_guess))
+            log.debug(
+                "---> OVERRIDE HOSTNAME_GUESS value: old=%s, new=%s"
+                % (self.hostname_guess, obj.hostname_guess)
+            )
             self.hostname_guess = obj.hostname_guess
-
-
-
 
 
 ## class to separate code for guessing the Mobistar Product based on IP address, description, hostname, etc
 class Product(object):
 
-    rfc1918 = [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16' ]
+    rfc1918 = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
 
     def __init__(self):
-        log.debug('new Product object')
-        self.function = "NONE"       # MGMT/LAN/WAN/NNI/OTHER
-        self.type = "NONE"           # P2P/LOOPBACK/IPSEC/IPSEC-MGMT/OTHER
-        self.product = "NONE"        # IP-VPN/CI/IP-UPLINK/VOIPT
-        self.transmission = "NONE"   # ATM/ETHERNET/VDSL/EXPLORE/3G/4G/INTERNET
+        log.debug("new Product object")
+        self.function = "NONE"  # MGMT/LAN/WAN/NNI/OTHER
+        self.type = "NONE"  # P2P/LOOPBACK/IPSEC/IPSEC-MGMT/OTHER
+        self.product = "NONE"  # IP-VPN/CI/IP-UPLINK/VOIPT
+        self.transmission = "NONE"  # ATM/ETHERNET/VDSL/EXPLORE/3G/4G/INTERNET
 
     def UpdateProduct(self, key, value, reason):
         log.debug("update product info by %reason: %s = %s" % (reason, key, value))
-        setattr(self, key, value) 
+        setattr(self, key, value)
 
     def ProductByInterface(self, intf):
         transmission = {
-                     'loopback': { 'transmission': 'VIRTUAL', 'type': 'LOOPBACK' },
-                     'dialer': { 'transmission': 'VIRTUAL', 'type': 'DIALER' },
-                     'atm': { 'transmission': 'ATM' },
-                     'cellular': { 'transmission': 'MOBILE', 'type': 'CELLULAR' },
-                     'ppp': { 'transmission': 'VDSL', 'type': 'PPP' },
-                     'ethernet': { 'transmission': 'ETHERNET' },
-                     'bundle-ether': { 'transmission': 'ETHERNET' },
-                    #  'tengigE0': { 'transmission': 'ETHERNET' },
-                    #  'port-channel': { 'transmission': 'ETHERNET' },
-                     'bvi': { 'transmission': 'VIRTUAL', 'type': 'BVI' },
-                     'vlan': { 'transmission': 'VIRTUAL', 'type': 'VLAN' },
-                     'virtual-template': { 'transmission': 'VIRTUAL' },
-                     'tunnel': { 'transmission': 'GRE', 'type': 'TUNNEL', 'function': 'IPSEC' },
-                  }
+            "loopback": {"transmission": "VIRTUAL", "type": "LOOPBACK"},
+            "dialer": {"transmission": "VIRTUAL", "type": "DIALER"},
+            "atm": {"transmission": "ATM"},
+            "cellular": {"transmission": "MOBILE", "type": "CELLULAR"},
+            "ppp": {"transmission": "VDSL", "type": "PPP"},
+            "ethernet": {"transmission": "ETHERNET"},
+            "bundle-ether": {"transmission": "ETHERNET"},
+            #  'tengigE0': { 'transmission': 'ETHERNET' },
+            #  'port-channel': { 'transmission': 'ETHERNET' },
+            "bvi": {"transmission": "VIRTUAL", "type": "BVI"},
+            "vlan": {"transmission": "VIRTUAL", "type": "VLAN"},
+            "virtual-template": {"transmission": "VIRTUAL"},
+            "tunnel": {"transmission": "GRE", "type": "TUNNEL", "function": "IPSEC"},
+        }
         for t in transmission:
             m = re.search(t, intf, re.I)
             if m:
                 for k in transmission[t]:
                     setattr(self, k, transmission[t][k])
-                    log.debug('found by interface (%s): %s = %s' % (intf, k, transmission[t][k]))
+                    log.debug(
+                        "found by interface (%s): %s = %s"
+                        % (intf, k, transmission[t][k])
+                    )
                 return
         log.error("Transmission was not found based on interface name: %s" % intf)
-        
 
     ## guess the product based on the PE router interface
-    #@staticmethod
+    # @staticmethod
     def ProductByPEIntf(self, pe, intf):
         pe_interfaces = {
-            'ant-ipsec-01': {
-                'gigabitethernet0\/1.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-internet', },
-                'gigabitethernet0\/3.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-ipvpn', },
-                'tunnel4[0-9][0-9][0-9][0-9].*': {},
+            "ant-ipsec-01": {
+                "gigabitethernet0\/1.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-internet",
+                },
+                "gigabitethernet0\/3.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-ipvpn",
+                },
+                "tunnel4[0-9][0-9][0-9][0-9].*": {},
             },
-            'nos-ipsec-01': {
-                'gigabitethernet0\/1.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-internet', },
-                'gigabitethernet0\/3.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-ipvpn', },
-                'tunnel4[0-9][0-9][0-9][0-9].*': {},
+            "nos-ipsec-01": {
+                "gigabitethernet0\/1.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-internet",
+                },
+                "gigabitethernet0\/3.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-ipvpn",
+                },
+                "tunnel4[0-9][0-9][0-9][0-9].*": {},
             },
-            'ant-ipsec-02': {
-                'gigabitethernet0\/1.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-internet', },
-                'gigabitethernet0\/3.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-ipvpn', },
-                'tunnel4[0-9][0-9][0-9][0-9].*': {},
+            "ant-ipsec-02": {
+                "gigabitethernet0\/1.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-internet",
+                },
+                "gigabitethernet0\/3.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-ipvpn",
+                },
+                "tunnel4[0-9][0-9][0-9][0-9].*": {},
             },
-            'nos-ipsec-02': {
-                'gigabitethernet0\/1.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-internet', },
-                'gigabitethernet0\/3.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-ipvpn', },
-                'tunnel4[0-9][0-9][0-9][0-9].*': {},
+            "nos-ipsec-02": {
+                "gigabitethernet0\/1.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-internet",
+                },
+                "gigabitethernet0\/3.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-ipvpn",
+                },
+                "tunnel4[0-9][0-9][0-9][0-9].*": {},
             },
-            'ant-var-05': {
-                'gigabitethernet3\/0\/7.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-ipvpn', },
+            "ant-var-05": {
+                "gigabitethernet3\/0\/7.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-ipvpn",
+                },
             },
-            'nos-var-05': {
-                'gigabitethernet3\/0\/7.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-ipvpn', },
+            "nos-var-05": {
+                "gigabitethernet3\/0\/7.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-ipvpn",
+                },
             },
-            'ant-var-01': {
-                'gigabitethernet3\/0\/19.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-internet', },
+            "ant-var-01": {
+                "gigabitethernet3\/0\/19.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-internet",
+                },
             },
-            'nos-var-01': {
-                'gigabitethernet3\/0\/19.*': { 'product': 'DMVPN', 'type': 'pe_p2p', 'function': 'ipsec-internet', },
+            "nos-var-01": {
+                "gigabitethernet3\/0\/19.*": {
+                    "product": "DMVPN",
+                    "type": "pe_p2p",
+                    "function": "ipsec-internet",
+                },
             },
-            'nos-emlp-01': {
-                'loopback5[0-9]{5}.*': { 'transmission': 'VDSL', 'type': 'p2p', 'function': 'WAN' }
+            "nos-emlp-01": {
+                "loopback5[0-9]{5}.*": {
+                    "transmission": "VDSL",
+                    "type": "p2p",
+                    "function": "WAN",
+                }
             },
-            'ant-emlp-01': {
-                'loopback5[0-9]{5}.*': { 'transmission': 'VDSL', 'type': 'p2p', 'function': 'WAN' }
+            "ant-emlp-01": {
+                "loopback5[0-9]{5}.*": {
+                    "transmission": "VDSL",
+                    "type": "p2p",
+                    "function": "WAN",
+                }
             },
         }
 
         ## make sure the PE is in lowercase
         pe = pe.lower()
-        #intf = intf.partition(".")[0].lower()
+        # intf = intf.partition(".")[0].lower()
         intf = intf.lower()
 
         if pe in pe_interfaces:
             for i in pe_interfaces[pe]:
                 m = re.match(i, intf)
                 if m:
-                    for k in [ 'product', 'function', 'type', 'transmission' ]:
+                    for k in ["product", "function", "type", "transmission"]:
                         if k in pe_interfaces[pe][i]:
                             setattr(self, k, pe_interfaces[pe][i][k])
-                            log.debug('found by PE interface (%s): %s = %s' % (intf, k, pe_interfaces[pe][i][k]))
-      
+                            log.debug(
+                                "found by PE interface (%s): %s = %s"
+                                % (intf, k, pe_interfaces[pe][i][k])
+                            )
 
-        #if pe in pe_interfaces:
+        # if pe in pe_interfaces:
         #    if intf in pe_interfaces[pe]:
         #        log.debug("Product found based on PE + intf (%s, %s): %s" % (pe, intf, pe_interfaces[pe][intf]))
         #        return pe_interfaces[pe][intf]
-        #log.debug("Product not found based on PE + interface (%s, %s)" % (pe, intf))
-
-
+        # log.debug("Product not found based on PE + interface (%s, %s)" % (pe, intf))
 
     ## guess the product based on IP address (ex. IPVPN, CI, IP UPLINK, ..)
     ## returns UNKNOWN if not found
     ## this function sets: function + product
-    #@staticmethod
+    # @staticmethod
     def ProductByIp(self, ip):
         # initialize the IP address if it could not be found
         if not ip:
@@ -923,69 +1085,100 @@ class Product(object):
         ## TODO: check if correct/complete
         ##       move this to general config file
         ipranges = {
-                     '94.105.20.2/32': { 'function': 'IPSEC', 'transmission': 'MOBILE' },  ## for 4G IPSEC tunnels
-                     '94.105.25.2/32': { 'function': 'IPSEC', 'transmission': 'MOBILE' },  ## for 4G IPSEC tunnels
-                     '94.105.20.9/32': { 'function': 'IPSEC', 'transmission': 'MOBILE' },  ## for 4G IPSEC tunnels
-                     '94.105.25.9/32': { 'function': 'IPSEC', 'transmission': 'MOBILE' },  ## for 4G IPSEC tunnels
-                     '94.105.0.0/18': { 'product': 'IPVPN', 'function': 'MGMT' },
-                     '94.105.128.0/17': { 'product': 'IPVPN', 'function': 'WAN' },
-                     '94.106.0.0/16': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.0.0/17': { 'product': 'CI', 'function': 'LAN' },  ## corporate internet is split up because some ranges are used for other purposes
-                     '94.107.128.0/18': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.192.0/20': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.208.0/24': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.209.0/24': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.210.0/23': { 'function': 'WAN', 'type': 'CELLULAR', 'transmission': 'MOBILE' },  ## 4G Mobile ip
-                     '94.107.212.0/24': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.213.0/24': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.214.0/24': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.215.0/24': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.216.0/21': { 'product': 'CI', 'function': 'LAN' },
-                     '94.107.224.0/22': { 'product': 'CI', 'function': 'LAN' },
-                     '94.104.128.0/17': { 'product': 'CI', 'function': 'WAN' },
-                     '94.104.20.0/22': { 'product': 'IPVPN-UNMGD', 'function': 'WAN' },
-                     '1.107.0.0/16': { 'product': 'IPVPN', 'function': 'MGMT' },
-                     '1.108.0.0/16': { 'product': 'IPVPN', 'function': 'MGMT' },
-                     '1.7.0.0/16': { 'product': 'IPVPN', 'function': 'WAN' },
-                     '1.8.0.0/16': { 'product': 'IPVPN', 'function': 'WAN' },
-                     '94.104.18.0/23': { 'product': 'ISDN', 'function': 'WAN' },
-                     '134.222.220.0/24': { 'product': 'NNI-KPNI', 'function': 'NNI' },
-                     '134.222.217.0/24': { 'product': 'NNI-KPNI', 'function': 'NNI' },
-                     '192.0.0.0/16': { 'product': 'IPVPN', 'function': 'IPSEC' },
-                     '192.0.0.0/24': { 'product': 'IPVPN', 'function': 'IPSEC' },
-                     '192.2.0.0/24': { 'product': 'IPVPN', 'function': 'IPSEC' },
-                     '192.0.2.0/24': { 'product': 'IPVPN', 'function': 'IPSEC' },
-                     '192.2.2.0/24': { 'product': 'IPVPN', 'function': 'IPSEC' },
-                     '192.4.2.0/24': { 'function': 'IPSEC', 'transmission': 'MOBILE' }, ## TODO: only for tunnel interfaces
-                     '192.4.9.0/24': { 'function': 'IPSEC', 'transmission': 'MOBILE' }, ## TODO: only for tunnel interfaces
-                     '192.4.21.0/24': { 'function': 'IPSEC', 'transmission': 'MOBILE' }, ## TODO: only for tunnel interfaces
-                     '192.4.91.0/24': { 'function': 'IPSEC', 'transmission': 'MOBILE' }, ## TODO: only for tunnel interfaces
-                     '192.99.0.0/16': { 'product': 'MGMT', 'function': 'IPSEC' },
-                   }
-        #ipobj = IPv4Network(ip)
+            "94.105.20.2/32": {
+                "function": "IPSEC",
+                "transmission": "MOBILE",
+            },  ## for 4G IPSEC tunnels
+            "94.105.25.2/32": {
+                "function": "IPSEC",
+                "transmission": "MOBILE",
+            },  ## for 4G IPSEC tunnels
+            "94.105.20.9/32": {
+                "function": "IPSEC",
+                "transmission": "MOBILE",
+            },  ## for 4G IPSEC tunnels
+            "94.105.25.9/32": {
+                "function": "IPSEC",
+                "transmission": "MOBILE",
+            },  ## for 4G IPSEC tunnels
+            "94.105.0.0/18": {"product": "IPVPN", "function": "MGMT"},
+            "94.105.128.0/17": {"product": "IPVPN", "function": "WAN"},
+            "94.106.0.0/16": {"product": "CI", "function": "LAN"},
+            "94.107.0.0/17": {
+                "product": "CI",
+                "function": "LAN",
+            },  ## corporate internet is split up because some ranges are used for other purposes
+            "94.107.128.0/18": {"product": "CI", "function": "LAN"},
+            "94.107.192.0/20": {"product": "CI", "function": "LAN"},
+            "94.107.208.0/24": {"product": "CI", "function": "LAN"},
+            "94.107.209.0/24": {"product": "CI", "function": "LAN"},
+            "94.107.210.0/23": {
+                "function": "WAN",
+                "type": "CELLULAR",
+                "transmission": "MOBILE",
+            },  ## 4G Mobile ip
+            "94.107.212.0/24": {"product": "CI", "function": "LAN"},
+            "94.107.213.0/24": {"product": "CI", "function": "LAN"},
+            "94.107.214.0/24": {"product": "CI", "function": "LAN"},
+            "94.107.215.0/24": {"product": "CI", "function": "LAN"},
+            "94.107.216.0/21": {"product": "CI", "function": "LAN"},
+            "94.107.224.0/22": {"product": "CI", "function": "LAN"},
+            "94.104.128.0/17": {"product": "CI", "function": "WAN"},
+            "94.104.20.0/22": {"product": "IPVPN-UNMGD", "function": "WAN"},
+            "1.107.0.0/16": {"product": "IPVPN", "function": "MGMT"},
+            "1.108.0.0/16": {"product": "IPVPN", "function": "MGMT"},
+            "1.7.0.0/16": {"product": "IPVPN", "function": "WAN"},
+            "1.8.0.0/16": {"product": "IPVPN", "function": "WAN"},
+            "94.104.18.0/23": {"product": "ISDN", "function": "WAN"},
+            "134.222.220.0/24": {"product": "NNI-KPNI", "function": "NNI"},
+            "134.222.217.0/24": {"product": "NNI-KPNI", "function": "NNI"},
+            "192.0.0.0/16": {"product": "IPVPN", "function": "IPSEC"},
+            "192.0.0.0/24": {"product": "IPVPN", "function": "IPSEC"},
+            "192.2.0.0/24": {"product": "IPVPN", "function": "IPSEC"},
+            "192.0.2.0/24": {"product": "IPVPN", "function": "IPSEC"},
+            "192.2.2.0/24": {"product": "IPVPN", "function": "IPSEC"},
+            "192.4.2.0/24": {
+                "function": "IPSEC",
+                "transmission": "MOBILE",
+            },  ## TODO: only for tunnel interfaces
+            "192.4.9.0/24": {
+                "function": "IPSEC",
+                "transmission": "MOBILE",
+            },  ## TODO: only for tunnel interfaces
+            "192.4.21.0/24": {
+                "function": "IPSEC",
+                "transmission": "MOBILE",
+            },  ## TODO: only for tunnel interfaces
+            "192.4.91.0/24": {
+                "function": "IPSEC",
+                "transmission": "MOBILE",
+            },  ## TODO: only for tunnel interfaces
+            "192.99.0.0/16": {"product": "MGMT", "function": "IPSEC"},
+        }
+        # ipobj = IPv4Network(ip)
         ipobj = ipaddress.ip_interface(ip)
         for i in ipranges:
-            #if ipobj in IPv4Network(i):
+            # if ipobj in IPv4Network(i):
             if ipobj.ip in ipaddress.ip_interface(i).network:
-                for k in [ 'product', 'function', 'type', 'transmission' ]:
+                for k in ["product", "function", "type", "transmission"]:
                     if k in ipranges[i]:
                         setattr(self, k, ipranges[i][k])
-                        log.debug('found by ip (%s): %s = %s' % (ip, k, ipranges[i][k]))
-                #self.product = ipranges[i]['product']
-                #self.function = ipranges[i]['function']
-                if self.function == 'MGMT' and ipobj.network.prefixlen == 32:
+                        log.debug("found by ip (%s): %s = %s" % (ip, k, ipranges[i][k]))
+                # self.product = ipranges[i]['product']
+                # self.function = ipranges[i]['function']
+                if self.function == "MGMT" and ipobj.network.prefixlen == 32:
                     self.type = "LOOPBACK"
-                elif self.function == 'WAN' and ipobj.network.prefixlen == 30:
+                elif self.function == "WAN" and ipobj.network.prefixlen == 30:
                     self.type = "P2P"
                 elif self.product == "CI" and ipobj.network.prefixlen == 32:
                     self.function = "MGMT"
                 if not self.type == "NONE":
-                        log.debug('found by ip (%s): %s = %s' % (ip, 'type', self.type))
-                #log.debug('product + function found based on ip "%s": %s - %s' % (ip, ipranges[i]['product'], ipranges[i]['function']))
+                    log.debug("found by ip (%s): %s = %s" % (ip, "type", self.type))
+                # log.debug('product + function found based on ip "%s": %s - %s' % (ip, ipranges[i]['product'], ipranges[i]['function']))
                 return
         ## nothing was found - see if it matches RFC1918 and then assign as LAN interface
         for i in self.rfc1918:
-            #if ipobj in IPv4Network(i):
+            # if ipobj in IPv4Network(i):
             if ipobj.ip in ipaddress.ip_interface(i).network:
                 log.debug('Function found based on ip "%s": %s' % (ip, "LAN"))
                 self.function = "LAN"
@@ -1015,28 +1208,28 @@ class VRF(object):
     ## main parser function
     def parse(self, vrfobj):
         m = self.reVrf.match(vrfobj.text)
-        self._parse_vrf_name(m.group('VRF'))
+        self._parse_vrf_name(m.group("VRF"))
 
         for l in vrfobj.children:
             # RT Export
             m = self.reRtExport.match(l.text)
             if m:
-                self._parse_rtExport(m.group('RT'))
+                self._parse_rtExport(m.group("RT"))
                 continue
             # RT Import
             m = self.reRtImport.match(l.text)
             if m:
-                self._parse_rtImport(m.group('RT'))
+                self._parse_rtImport(m.group("RT"))
                 continue
             # RD
             m = self.reRd.match(l.text)
             if m:
-                self._parse_RD(m.group('RD'))
+                self._parse_RD(m.group("RD"))
                 continue
             # ExportMap
             m = self.reExportMap.match(l.text)
             if m:
-                self._parse_ExportMap(m.group('MAP'))
+                self._parse_ExportMap(m.group("MAP"))
                 continue
             else:
                 ## catch-all rule for debugging
@@ -1066,4 +1259,3 @@ class VRF(object):
     def _parse_ExportMap(self, map):
         log.debug("--> Export map found: %s" % map)
         self.export_map = map
-

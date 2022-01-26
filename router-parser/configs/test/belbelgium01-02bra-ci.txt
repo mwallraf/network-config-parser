@@ -1,0 +1,408 @@
+!
+! ### START OF CONFIG ###
+!
+! HOSTNAME: belbelgium01-02bra-ci
+! VENDOR: ONEACCESS
+! HARDWARE: LBB_320
+! SOFTWARE: ONEOS92-DUAL_FT-V5.2R2E7_HA8
+! OS: oneaccess_oneos
+! PARTNER: OBE
+! DISCOVERED FUNCTION: CPE
+! DISCOVERED SERVICE: CI
+! DISCOVERED MULTISERVICE: false
+! FIRST SEEN: 1542859933
+! LAST SEEN: 1643026016
+! FUNCTION: CPE
+! PROTOCOL: ssh
+! BACKUP TEMPLATE: backup.exscript
+! SYSTEM MAC ADDRESS: 70FC8C0668DA
+! SERIALNUMBER: S1642007796093516
+!
+! VERSION: Software version    : ONEOS92-DUAL_FT-V5.2R2E7_HA8
+! VERSION: Software created on : 04/08/20 17:31:55
+! VERSION:
+!
+! PRODUCT:
+! PRODUCT: +----------------------------------------------------------------+
+! PRODUCT: |                       Product Info Area                        |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Key                          | Value                           |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac0                         | 70:FC:8C:06:68:DA               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac1                         | 70:FC:8C:0A:68:DA               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac2                         | 70:FC:8C:0E:68:DA               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac3                         | 70:FC:8C:12:68:DA               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac4                         | 70:FC:8C:16:68:DA               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac5                         | 70:FC:8C:1A:68:DA               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac6                         | 70:FC:8C:1E:68:DA               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac7                         | 70:FC:8C:22:68:DA               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac8                         | 70:FC:8C:06:68:DB               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac9                         | 70:FC:8C:0A:68:DB               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac10                        | 70:FC:8C:0E:68:DB               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac11                        | 70:FC:8C:12:68:DB               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac12                        | 70:FC:8C:16:68:DB               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac13                        | 70:FC:8C:1A:68:DB               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac14                        | 70:FC:8C:1E:68:DB               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | mac15                        | 70:FC:8C:22:68:DB               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Manufacturing File Reference | 1090 00 N 0047796A00 AA         |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Motherboard Type             | MB92SFPENW+R                    |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Manufacturing Location       | SZEK                            |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Manufacturing Date           | 20/10/2016                      |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Serial Number                | S1642007796093516               |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Product name                 | LBB_320                         |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Commercial name              | LBB 320                         |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Mreturn1                     |                                 |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Mreturn2                     |                                 |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Mreturn3                     |                                 |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT: | Mreturn4                     |                                 |
+! PRODUCT: +------------------------------+---------------------------------+
+! PRODUCT:
+!
+! INT: Interface              IP-Address      OK? Status                Protocol Description
+! INT: GigabitEthernet 0/0       94.107.238.225  YES up                    up      ***LAN***
+! INT: GigabitEthernet 0/1       <unassigned>    YES up                    down
+! INT: GigabitEthernet 0/2       <unassigned>    YES up                    down
+! INT: GigabitEthernet 0/3       <unassigned>    YES up                    down
+! INT: GigabitEthernet 1/0       94.104.249.138  YES up                    up      *** VT105348 - GS20161027504 - CORPORATE INTERNET - Ext Ethernet/Fiber Ethernet - NOS-ASR-01 - Bundle-Ether1008.7 ***
+! INT: Loopback 0                127.0.0.1       YES up                    up
+! INT: Null 0                    <unassigned>    YES up                    up
+! INT: dot11radio 0/0            <unassigned>    NO  down                  down
+! INT:
+!
+! SYSTEM_STATUS:
+! SYSTEM_STATUS: System Information for device MB92SFPENW+R S/N S1642007796093516
+! SYSTEM_STATUS:
+! SYSTEM_STATUS: Software version    : ONEOS92-DUAL_FT-V5.2R2E7_HA8
+! SYSTEM_STATUS: Software created on : 04/08/20 17:31:55
+! SYSTEM_STATUS: License token       : None
+! SYSTEM_STATUS: Boot version        : BOOT92-SEC-V5.2R2E18C
+! SYSTEM_STATUS: Boot created on     : 02/06/16 15:52:51
+! SYSTEM_STATUS:
+! SYSTEM_STATUS: Boot Flags          : 0x00000008
+! SYSTEM_STATUS:
+! SYSTEM_STATUS: Current system time : 24/01/22 13:06:56
+! SYSTEM_STATUS: System started      : 26/11/21 10:57:23
+! SYSTEM_STATUS: Start caused by     : Software requested / System defense - reboot after crash
+! SYSTEM_STATUS: Sys Up time         : 59d 2h 9m 33s
+! SYSTEM_STATUS: System clock ticks  : 255273985
+! SYSTEM_STATUS:
+! SYSTEM_STATUS: Core 0,     control, CPU load for 1 second: 25.1% (Critical 2.9% Non Critical 22.2%), 1 minute 7.0%
+! SYSTEM_STATUS: Average CPU load (5 / 60 Minutes)         : 7.0% / 7.0%
+! SYSTEM_STATUS: Core 1,  forwarding, CPU load for 1 second: 14.0% , 1 minute 14.0%
+! SYSTEM_STATUS: Average CPU load (5 / 60 Minutes)         : 13.0% / 13.0%
+! SYSTEM_STATUS:
+! SYSTEM_STATUS: Free / Max RAM      : 1115,50 / 2004,97 MB
+! SYSTEM_STATUS:
+! SYSTEM_STATUS: Redundant PSU       : PSU 1 OK / PSU 2 unplugged
+! SYSTEM_STATUS:
+! SYSTEM_STATUS:
+!
+! SYSTEM_HW:
+! SYSTEM_HW:  HARDWARE DESCRIPTION
+! SYSTEM_HW:
+! SYSTEM_HW:   Device   : LBB_320
+! SYSTEM_HW:   CPU      : Freescale P2020E - Security Engine
+! SYSTEM_HW:
+! SYSTEM_HW:  Core Freq : 1200MHz   DDR Freq : 600MHz
+! SYSTEM_HW:  Core Complex Bus Freq : 600MHz   Platform Freq : 600MHz
+! SYSTEM_HW:  CPLD Index : 0x1   CPLD Version : 0x8
+! SYSTEM_HW:  Physical Ram size : 2048Mo   OneOS Ram size : 2048Mo
+! SYSTEM_HW:  Nand Flash size : 256Mo
+! SYSTEM_HW:  Ram disk :   1Mo   Flash disk : 246Mo
+! SYSTEM_HW:
+! SYSTEM_HW:  Local : x Uplink :      ISDN :      Radio :      Usb0 :      Usb1 :
+! SYSTEM_HW:
+! SYSTEM_HW:  Local  : SFP ETHERNET + GIGABIT ETHERNET + SWITCH ETHERNET / 4 ports
+! SYSTEM_HW:  Dsp    : 0
+! SYSTEM_HW:  Wlan   : VendorID (0x168c) / DeviceID (0x002e)
+! SYSTEM_HW:
+! SYSTEM_HW:
+!
+! VRF:  VRF Name                          VRF Id                    Interfaces
+! VRF:
+! VRF:
+!
+! BGP: BGP router identifier 94.104.249.138, local AS number 65000, vrf (null)
+! BGP: 2 BGP AS-PATH entries
+! BGP: 0 BGP community entries
+! BGP:
+! BGP: Neighbor        V     AS     MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+! BGP: 94.104.249.137  4      47377   85007   85028       23    0    0 3d00h26m        1
+! BGP:
+! BGP: Total number of neighbors 1
+! BGP:
+!
+! CELLULAR_NETWORK:  Current selected operator                            :  <not available>
+! CELLULAR_NETWORK:  Signal strength                                      :  <not available>
+! CELLULAR_NETWORK:  Total Ec/Io                                          :  <not available>
+! CELLULAR_NETWORK:  RSSI                                                 :  <not available>
+! CELLULAR_NETWORK:  RSRQ                                                 :  <not available>
+! CELLULAR_NETWORK:  RSRP                                                 :  <not available>
+! CELLULAR_NETWORK:  SNR                                                  :  <not available>
+! CELLULAR_NETWORK:  Current radio access technology                      :  <not available>
+! CELLULAR_NETWORK:  Circuit-switched register state                      :  <not available>
+! CELLULAR_NETWORK:  Packet-switched attach state                         :  <not available>
+! CELLULAR_NETWORK:
+! CELLULAR_NETWORK: Statistics:
+! CELLULAR_NETWORK:  Reset on loss of GPRS registration                   :  <not available>
+! CELLULAR_NETWORK:  Reset on failed initial registration                 :  <not available>
+! CELLULAR_NETWORK:  Hardware reset of modem                              :  <not available>
+! CELLULAR_NETWORK:  Unknown reset of modem                               :  <not available>
+! CELLULAR_NETWORK:
+! CELLULAR_NETWORK: Details:
+! CELLULAR_NETWORK:  Location Area Code (LAC)                             :  <not available>
+! CELLULAR_NETWORK:  Cell ID                                              :  <not available>
+! CELLULAR_NETWORK:  Tracking Area Code (TAC)                             :  <not available>
+! CELLULAR_NETWORK:  Current Public Land Mobile Network (PLMN = MCC+MNC)  :  <not available>
+! CELLULAR_NETWORK:
+!
+! CELLULAR_HARDWARE:  Cellular Radio Modem Information
+! CELLULAR_HARDWARE:   Manufacturer identification                          : <not available>
+! CELLULAR_HARDWARE:   Equipment information                                : <not available>
+! CELLULAR_HARDWARE:   Boot revision identification                         : <not available>
+! CELLULAR_HARDWARE:   Revision identification                              : <not available>
+! CELLULAR_HARDWARE:   Equipment information (IMEI)                         : <not available>
+! CELLULAR_HARDWARE:
+! CELLULAR_HARDWARE:  SIM Card Information
+! CELLULAR_HARDWARE:   SIM card status                                      : <not available>
+! CELLULAR_HARDWARE:   SIM International Mobile Subscriber Identity IMSI    : <not available>
+! CELLULAR_HARDWARE:   Integrated Circuit Card ID                           : <not available>
+! CELLULAR_HARDWARE:
+! CELLULAR_HARDWARE:  PIN Information
+! CELLULAR_HARDWARE:   PIN code status                                      : <not available>
+! CELLULAR_HARDWARE:
+!
+!
+! QOS: GigabitEthernet 1/0: service-policy output GENERIC_NOQOS_SHAPE100M_OUT
+! QOS: traffic statistics:
+! QOS:   Class 'CLASS_ANY':
+! QOS:     3215791014 packets, 1105965652128 bytes, 114078559 dscp remarked, mean input rate 2981496 bits/s
+! QOS:   Class 'class-default':
+! QOS:     0 packets, 0 bytes, 0 dscp remarked, mean input rate 0 bits/s
+! QOS:
+! QOS: output queuing statistics:
+! QOS:   Class 'CLASS_ANY': medium priority (no excess allowed)
+! QOS:     bandwidth 98000 kb/s, burst 243902 bytes, queue length/limit 0/50
+! QOS:     mean input rate 3228704 bits/s, mean output rate 3228704 bits/s
+! QOS:     packets output 3215173682, packets dropped 617198 (0%)
+! QOS:     bytes output 1165516605667, bytes dropped 738198817 (0%)
+! QOS:   Class 'class-default': medium priority
+! QOS:     bandwidth 2000 kb/s, burst 82256 bytes, queue length/limit 0/50
+! QOS:     mean input rate 0 bits/s, mean output rate 0 bits/s
+! QOS:     packets output 826, packets dropped 0 (0%)
+! QOS:     bytes output 56168, bytes dropped 0 (0%)
+! QOS:     remaining-bandwidth share 2, excess-rate-priority 0, excess packets sent 0
+! QOS:   Interface total:
+! QOS:     bandwidth 100000 kb/s
+! QOS:     mean input rate 3228704 bits/s, mean output rate 3228704 bits/s
+! QOS:     packets output 3215174524, packets dropped 617198 (0%)
+! QOS:     bytes output 1165516667711, bytes dropped 738198817 (0%)
+! QOS:
+! QOS:
+!
+Building configuration...
+
+Current configuration:
+
+!
+bind telnet acl MANAGEMENT_IN
+bind telnet GigabitEthernet 1/0
+bind ssh GigabitEthernet 1/0
+!
+bind ssh acl MANAGEMENT_IN
+!
+!
+telnet timeout 900
+ip telnet disable
+blacklist attempts 10 quarantine-delay 60
+!
+bind telnet vrf default-router
+bind ssh vrf default-router
+no reboot recovery-on-error
+!
+clock timezone CET 1
+clock summer-time recurring CET last Sunday March 02:00 last Sunday October 03:00
+!
+set multiple-conf-sessions enable
+!
+logging buffered debug
+logging syslog informational
+logging timestamp datetime
+logging buffered size 16364
+!
+login on-success log
+login on-failure log
+hostname belbelgium01-02bra-ci
+no ip source-route
+ip ssh timeout 900
+ip ssh auth-timeout 30
+ip ssh enable
+!
+banner motd sequence 1 *       __  _______  ___  _________________   ___    ___________\r\n*
+banner motd sequence 2 *      /  |/  / __ \/ _ )/  _/ __/_  __/ _ | / _ \  / __/ __/ _ \\r\n*
+banner motd sequence 3 *     / /|_/ / /_/ / _  |/ /_\ \  / / / __ |/ , _/ / _/_\ \/ // /\r\n*
+banner motd sequence 4 *    /_/  /_/\____/____/___/___/ /_/ /_/ |_/_/|_| /_/ /___/____/\r\n*
+banner motd sequence 5 *\r\n*
+banner motd sequence 6 *---------------------------------------------------------------------\r\n*
+banner motd sequence 7 *|               --- >  W A R N I N G  < ---                         |\r\n*
+banner motd sequence 8 *|                                                                   |\r\n*
+banner motd sequence 9 *|Unauthorized use and/or misuse of this system and services may     |\r\n*
+banner motd sequence 10 *|constitute a breach of International criminal law, and could lead  |\r\n*
+banner motd sequence 11 *|to legal & disciplinary actions. Individuals using this sytem      |\r\n*
+banner motd sequence 12 *|without authority or in excess of their authority are subject to   |\r\n*
+banner motd sequence 13 *|having all their activities monitored, recorded & examined by any  |\r\n*
+banner motd sequence 14 *|authorized person, including law enforcement, as deemed appropriate|\r\n*
+banner motd sequence 15 *|                                                                   |\r\n*
+banner motd sequence 16 *|                    !!! LOG OFF IMMEDIATELY !!!                    |\r\n*
+banner motd sequence 17 *---------------------------------------------------------------------\r\n*
+banner exec sequence 1 * _____         _____                        __    _____ _____ \r\n*
+banner exec sequence 2 *|     |___ ___|  _  |___ ___ ___ ___ ___   |  |  | __  | __  |\r\n*
+banner exec sequence 3 *|  |  |   | -_|     |  _|  _| -_|_ -|_ -|  |  |__| __ -| __ -|\r\n*
+banner exec sequence 4 *|_____|_|_|___|__|__|___|___|___|___|___|  |_____|_____|_____|\r\n*
+!
+ip access-list standard 52
+ remark  ** Used for snmp management **
+ permit 91.208.220.0 0.0.0.255
+exit
+ip access-list extended MANAGEMENT_IN
+ remark  *** ACCESS-LIST FOR INCOMING CONNECTIONS TO THIS ROUTER ***
+ permit tcp 91.208.220.0 0.0.0.255 0.0.0.0 255.255.255.255 22
+ permit tcp 91.208.220.0 0.0.0.255 0.0.0.0 255.255.255.255 23
+ permit tcp 94.104.18.0 0.0.1.255 0.0.0.0 255.255.255.255 22
+ permit tcp 94.104.18.0 0.0.1.255 0.0.0.0 255.255.255.255 23
+ remark  *** P2P RANGE ***
+ permit tcp 94.104.249.136 0.0.0.3 0.0.0.0 255.255.255.255 22
+ permit tcp 94.104.249.136 0.0.0.3 0.0.0.0 255.255.255.255 23
+ remark  *** AUTOPROVISIONING ***
+ permit tcp 10.110.0.0 0.0.255.255 0.0.0.0 255.255.255.255 23
+ remark  *** backup router access ***
+ permit tcp 192.0.2.0 0.0.0.255 0.0.0.0 255.255.255.255 22
+ permit tcp 192.0.2.0 0.0.0.255 0.0.0.0 255.255.255.255 23
+ remark  *** DENY OTHER ACCESS ***
+ deny ip 0.0.0.0 255.255.255.255 0.0.0.0 255.255.255.255
+exit
+!
+class-map match-any CLASS_ANY
+ match any
+exit
+!
+policy-map GENERIC_NOQOS_SHAPE100M_OUT
+ description *** generic NO-QOS policy-map ***
+ class CLASS_ANY
+
+  set ip dscp default
+  shape-average 98000
+ exit
+exit
+!
+multi-mac-address enable
+!
+!
+interface GigabitEthernet 0/0
+ ip address 94.107.238.225 255.255.255.248
+ description ***LAN***
+exit
+interface GigabitEthernet 0/1
+exit
+interface GigabitEthernet 0/2
+exit
+interface GigabitEthernet 0/3
+exit
+interface GigabitEthernet 1/0
+ ip address 94.104.249.138 255.255.255.252
+ ip mtu 4000
+ description *** VT105348 - GS20161027504 - CORPORATE INTERNET - Ext Ethernet/Fiber Ethernet - NOS-ASR-01 - Bundle-Ether1008.7 ***
+ bandwidth 100000
+ service-policy output GENERIC_NOQOS_SHAPE100M_OUT
+exit
+!
+interface dot11radio 0/0
+ dot11 qos wmm
+exit
+!
+router bgp 65000
+ bgp router-id 94.104.249.138
+ redistribute connected
+ neighbor 94.104.249.137
+  remote-as 47377
+  description *** VT105348 ***
+  soft-reconfiguration inbound
+ exit
+exit
+snmp traps bgp
+!
+tacacs-server 91.208.220.142 6b57e38f62d089b98be63ff357fccc9e9d959eba64bc encrypted GigabitEthernet 1/0
+tacacs-server 91.208.220.14 6b57e38f62d089b98be63ff357fccc9e9d959eba64bc encrypted GigabitEthernet 1/0
+aaa group server tacacs OBE
+ server 91.208.220.142
+ server 91.208.220.14
+exit
+aaa authentication login default OBE
+aaa authentication login console OBE
+aaa authentication enable default OBE
+aaa authentication enable console OBE
+aaa authorization exec default if-authenticated tacacs+
+aaa authorization command 1 OBE
+aaa authorization command 15 OBE
+aaa authorization network group OBE
+aaa accounting exec default start-stop group OBE
+aaa accounting commands 1 default stop-only group OBE
+aaa accounting commands 15 default stop-only group OBE
+aaa accounting system default start-stop group OBE
+aaa authentication banner sequence 1 *-TACACS SERVER UNAVAILABLE-*
+!
+ip domain-name as47377.net
+!
+sntp server 91.208.220.147 GigabitEthernet 1/0
+sntp server 91.208.220.19 GigabitEthernet 1/0
+!
+syslog server 91.208.220.143 23 GigabitEthernet 1/0
+syslog server 91.208.220.15 23 GigabitEthernet 1/0
+syslog-server enable
+!
+snmp vrf default-router
+snmp set-write-community "Kl3t5k0p" 52
+no snmp set-write-community private
+snmp set-read-community "5pr1t5" 52
+no snmp set-read-community public
+snmp trap-source GigabitEthernet 1/0
+!
+!
+!
+!
+!
+config-management
+ add-separator
+exit
+!
+end
+
+
+!
+! ### END OF CONFIG ###
