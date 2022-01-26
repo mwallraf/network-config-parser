@@ -128,6 +128,10 @@ dmypy.json
 .pyre/
 
 router-parser/configs/*.txt
+router-parser/configs/test/*.txt
+router-parser/configs/test_all/*.txt
 router-parser/logs/*.log
+router-parser/log/*.log.*
 router-parser/output/*.csv
 router-parser/__remove__main.py
+*.1
