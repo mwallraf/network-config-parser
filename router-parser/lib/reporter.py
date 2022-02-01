@@ -22,6 +22,9 @@ class Reporter(object):
     delim2 = ","
     report = []  # contains the generated report, each row = 1 interface object
 
+    # TODO
+    # 'CPE_MANAGED',
+
     header = {
         "hostname": "CE_HOSTNAME",
         "hostname_guess": "CE_HOSTNAME_GUESS",
@@ -29,6 +32,10 @@ class Reporter(object):
         "mgmt": "CPE_LOOPBACK",
         "allvt": "SERVICEID",
         "product": "PRODUCT",
+        "cpe_wan_ip": "CPE_WAN_IP",
+        "cpe_wan_subnet": "CPE_WAN_SUBNET",
+        "cpe_wan_mask": "CPE_WAN_MASK",
+        "cpe_multivrf": "CPE_MULTIVRF",
         "pe": "PE",
         "pe_intf": "PE_INT",
         "pe_qos_policy_in": "PE_QOS_POLICY_IN",
@@ -43,7 +50,7 @@ class Reporter(object):
         "cellularimsi": "CPE_CELLULAR_IMSI",
         "cellularcellid": "CPE_CELLULAR_CELLID",
         "cellularoperator": "CPE_CELLULAR_OPERATOR",
-        "ce_intf": "CPE_INT",
+        "ce_intf": "CPE_WAN_INT",
         "ce_vrf": "CPE_VRF",
         "cpe_qos_policy_in": "CPE_QOS_POLICY_IN",
         "cpe_qos_policy_out": "CPE_QOS_POLICY_OUT",
@@ -64,6 +71,10 @@ class Reporter(object):
         "hostname",
         "hostname_guess",
         "mgmt",
+        "cpe_wan_ip",
+        "cpe_wan_subnet",
+        "cpe_wan_mask",
+        "cpe_multivrf",
         "pe",
         "pe_intf",
         "pe_vrf",
@@ -196,7 +207,9 @@ class Reporter(object):
         )
 
         ## get the WAN network range
-        v["wan"] = str(obj.network)
+        v["cpe_wan_ip"] = str(obj.ip)
+        v["cpe_wan_subnet"] = str(obj.network)
+        v["cpe_wan_mask"] = str(obj.mask)
 
         ## find PE router where this interface is connected to
         if rtr.isPE():
@@ -247,6 +260,9 @@ class Reporter(object):
         ## get the CPE interface name
         if rtr.isCPE():
             v["ce_intf"] = str(obj.intf)
+
+        if rtr.isCPE():
+            v["cpe_multivrf"] = "YES" if rtr.is_multivrf else "NO"
 
         ## get the interface VRF
         if rtr.isPE():

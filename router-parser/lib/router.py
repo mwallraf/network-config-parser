@@ -52,6 +52,9 @@ class RouterFactory(object):
 class Router(object):
     # configdir = ""
     TELNETOK = 1  # number of days since "lastseen" timestamp that we consider telnet to be working
+    INTERNAL_VRF = [
+        "MODEM"
+    ]  # internally used for mgmt purposes, exclude these from props like "is_multivrf"
 
     def __init__(self, configfile):
         self.props = {
@@ -76,6 +79,18 @@ class Router(object):
             "telnetok": False,  # assume telnet is ok if lastseen date is recent
             "configfile": configfile,  # name of the config file that is being parsed
         }
+
+    @property
+    def is_multivrf(self):
+        """Returns True if the router has at least 1 VRF configured
+        VRFs used for management are excluded here
+        """
+        vrflist = [
+            vrf for vrf in self.props["all_vrfs"] if vrf.vrf not in self.INTERNAL_VRF
+        ]
+        if len(vrflist) > 0:
+            return True
+        return False
 
     # parse the running config of a router and get all info
     def ParseRunningConfig(self, config):
@@ -159,6 +174,19 @@ class Router(object):
             [allvt.append(vt) for o in self.props["all_interfaces"] for vt in o.vt]
         return allvt
 
+    def _merge_two_interfaces(self, intf1, intf2):
+        """Merges two IOSCfgline objects into 1
+        The interface of the intf1 is used as the new interface
+        This returns again an IOSCfgline object
+        """
+        new_interface = CiscoConfParse(
+            [intf1.text]
+            + [line.text for line in intf1.children]
+            + [line.text for line in intf2.children]
+        )
+        intf_cfg = new_interface.find_objects(intf1.text)
+        return intf_cfg
+
     # parse the output of "show ip int brief" to find all L3 interfaces
     # for all the interfaces found, create an interface object
     # we use output of "show ip int brief" to make sure that we see the IP for DHCP interfaces and virtual interfaces
@@ -168,7 +196,7 @@ class Router(object):
         )
         for l in lines:
             m = re.match(
-                r"! INT: +([\w\/\. \-]+\w).*\W([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|<unassigned>).*(?:[yesYES]|[noNO])",
+                r"! INT: +([\w\/\. \-]+\w).*\W([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|<unassigned>).*(?:[upUP]|[downDOWN])",
                 l,
             )
             if not m:
@@ -215,6 +243,26 @@ class Router(object):
                     )
                     continue
 
+                # we need to match the interface name found in "show ip int brief" with
+                # the interface name found in "show running-config"
+                # With severeal OS there is a mismatch due to change in upper/lower case
+                # Exception: we don't want to match Dialer from "show ip int brief" with dialer from "show run"
+                #            because this should be mapped to virtual-template instead
+                all_interfaces = self.parser.find_lines("^interface \w+")
+                m = re.findall(
+                    r"interface ((?!Virtual-Access)[\w\/\. \-]+\w)",
+                    "\n".join(all_interfaces),
+                    re.MULTILINE,
+                )
+                matched_interfaces = [i for i in m if _intf.lower() == i.lower()]
+                if matched_interfaces:
+                    log.debug(
+                        "matched the interface show_ip_int_brief={}, show_run={}".format(
+                            _intf, matched_interfaces[0]
+                        )
+                    )
+                    _intf = matched_interfaces[0]
+
                 m = re.match(r"([^0-9]+)(.*)", _intf)
                 # interface may be truncated in "show ip int brief" output
                 if len(m.groups()) > 0:
@@ -224,22 +272,64 @@ class Router(object):
                 try:
                     # in some OS versions the first letter does not always correspond between
                     # operational output and config output
-                    # caveat: do not do this for dialer interfaces because this messes up the
+                    # caveat: don't lowercase Dialer interfaces because this messes up the
                     #         translation from dialer to virtual-template ppp
-                    if _intf_name.startswith("Dialer") or _intf_name.startswith(
-                        "Virtual-Access"
-                    ):
-                        first_letter = _intf_name[0]
-                    else:
-                        first_letter = "[{}{}]".format(
-                            _intf_name[0].lower(), _intf_name[0].upper()
-                        )
+                    #         there also exists a dialer interface in the config but this
+                    #         config does not have the ip address info etc
+                    # if _intf_name.startswith("Dialer") or _intf_name.startswith(
+                    #     "Virtual-Access"
+                    # ):
+                    #     first_letter = _intf_name[0]
+                    # else:
+                    #     first_letter = "[{}{}]".format(
+                    #         _intf_name[0].lower(), _intf_name[0].upper()
+                    #     )
+
+                    # log.debug(m)
+                    # for i in m:
+                    #     log.debug("i={}".format(i))
+                    #     log.debug("to match={}".format(_intf_name))
+                    #     if i.lower() == _intf_name.lower():
+                    #         print("MATCH FOUND")
+                    # log.debug("all interfaces: {}".format(m))
+                    # log.debug("matched interface: {}".format(found_interface))
+
+                    # match the "show run" interfaces withe the "show ip int brief" interface
+                    # intf_cfg = self.parser.find_objects(
+                    #     "^interface {}{}[^0-9]*{}( .*)?$".format(
+                    #         first_letter, _intf_name[1:], _intf_idx
+                    #     )
+                    # )
                     intf_cfg = self.parser.find_objects(
-                        "^interface {}{}[^0-9]*{}( .*)?$".format(
-                            first_letter, _intf_name[1:], _intf_idx
-                        )
+                        "^interface {}[^0-9]*{}( .*)?$".format(_intf_name, _intf_idx)
                     )
-                    # intf_cfg = self.parser.find_objects("^interface {}[^0-9]*{}( .*)?$".format(_intf_name, _intf_idx))
+
+                    # if the interface is a dialer then we want to include the config from the virtual-template as well
+                    m = re.match("[dD]ialer (.*)", _intf_name)
+                    if m:
+                        # intf_cfg.children = (
+                        #     intf_cfg.children + virtual_template_cfg[0].children
+                        # )
+
+                        virtual_template_cfg = self.parser.find_objects(
+                            "^%s[^0-9]*%s( .*)?$" % ("^virtual-template ppp", _intf_idx)
+                        )
+                        if len(virtual_template_cfg) > 0:
+                            intf_cfg = self._merge_two_interfaces(
+                                virtual_template_cfg[0], intf_cfg[0]
+                            )
+                            # log.debug(intf_cfg)
+                            # log.debug(virtual_template_cfg)
+                            # log.debug(
+                            #     [line.text for line in virtual_template_cfg[0].children]
+                            # )
+                            log.debug(
+                                "found virtual-template ppp configuration: {}".format(
+                                    intf_cfg
+                                )
+                            )
+                        pass
+
                 except:
                     intf_cfg = []
                 if not len(intf_cfg) > 0:
@@ -931,8 +1021,8 @@ class Product(object):
             "ppp": {"transmission": "VDSL", "type": "PPP"},
             "ethernet": {"transmission": "ETHERNET"},
             "bundle-ether": {"transmission": "ETHERNET"},
-            #  'tengigE0': { 'transmission': 'ETHERNET' },
-            #  'port-channel': { 'transmission': 'ETHERNET' },
+            "tengigE": {"transmission": "ETHERNET"},
+            "port-channel": {"transmission": "ETHERNET"},
             "bvi": {"transmission": "VIRTUAL", "type": "BVI"},
             "vlan": {"transmission": "VIRTUAL", "type": "VLAN"},
             "virtual-template": {"transmission": "VIRTUAL"},
