@@ -26,11 +26,12 @@ class Reporter(object):
     # 'CPE_MANAGED',
 
     header = {
+        "vt": "SERVICEID",
+        "allvt": "CPE_INTF_ALL_VT",
         "hostname": "CE_HOSTNAME",
         "hostname_guess": "CE_HOSTNAME_GUESS",
         "pe_vrf": "VRF",
         "mgmt": "CPE_LOOPBACK",
-        "allvt": "SERVICEID",
         "product": "PRODUCT",
         "cpe_wan_ip": "CPE_WAN_IP",
         "cpe_wan_subnet": "CPE_WAN_SUBNET",
@@ -67,6 +68,7 @@ class Reporter(object):
     # header_values = [ 'hostname', 'hostname_guess', 'product', 'intf_function', 'intf_type', 'transmission', 'mgmt', 'wan', 'pe', 'telnetok', 'allvt', 'pe_intf', 'pe_vrf', 'ce_intf', 'ce_vrf', 'test' ]
     # header_values = [ 'hostname', 'hostname_guess', 'mgmt', 'vt', 'product', 'pe', 'pe_intf', 'transmission', 'intf_function', 'intf_type', 'wan', 'telnetok', 'allvt', 'pe_intf', 'pe_vrf', 'ce_intf', 'ce_vrf', 'test' ]
     header_values = [
+        "vt",
         "allvt",
         "hostname",
         "hostname_guess",
@@ -248,6 +250,8 @@ class Reporter(object):
             if len(v["allvt"]) <= 0:
                 v["allvt"] = v["allvt"] + rtr.GetAllVTFromRouter()
         v["allvt"] = self.delim2.join(sorted(set(v["allvt"])))
+
+        v["vt"] = obj.newestvt
 
         ## find the PE interfaces for this interface
         if rtr.isPE():

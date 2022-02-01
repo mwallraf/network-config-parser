@@ -624,6 +624,19 @@ class interface(object):
             )
         )
 
+    @property
+    def newestvt(self):
+        """Returns the highest (=most recent) VT number"""
+        if not (self.vt):
+            return ""
+
+        sorted_list = self.vt
+        try:
+            sorted_list = sorted(self.vt, key=lambda item: int(item[2:]), reverse=True)
+        except:
+            pass
+        return sorted_list[0]
+
     ## returns what is supposed to be a unique key for this interface/product
     ## for regular P2P interfaces the P2P network address should be unique
     ## for IPSEC Tunnel interfaces it's the tunnel ID + network address
