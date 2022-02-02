@@ -249,9 +249,10 @@ class Reporter(object):
             ## if no VT's found are found at all, then get all VT's based on other interfaces of the CPE
             if len(v["allvt"]) <= 0:
                 v["allvt"] = v["allvt"] + rtr.GetAllVTFromRouter()
+        v["allvt"] = [vt for vt in v["allvt"] if vt]
         v["allvt"] = self.delim2.join(sorted(set(v["allvt"])))
 
-        v["vt"] = obj.newestvt
+        v["vt"] = obj.newestvt or obj.vt or v["allvt"]
 
         ## find the PE interfaces for this interface
         if rtr.isPE():
