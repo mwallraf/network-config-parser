@@ -56,7 +56,8 @@ def run_app(args={}):
     # drop the host column and rename all the network-discovery columns by prepending DISC_*
     df = pd.merge(df1, df2, how="left", left_on="CE_HOSTNAME", right_on="host")
     df = df.drop(columns=["host"])
-    df = df.rename(columns={ "domainname": "DISC_DOMAINNAME", 
+    df = df.rename(columns={ "managementip": "DISC_MGMT_IP",
+                             "domainname": "DISC_DOMAINNAME", 
     	                     "community": "DISC_COMMUNITY", 
     	                     "sysobjid": "DISC_SYSOBJID", 
     	                     "vendor": "DISC_VENDOR", 
