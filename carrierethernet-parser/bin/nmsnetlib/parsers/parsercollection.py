@@ -936,6 +936,14 @@ class ParserCollection(object):
         ## each vlan can have either the vlan id or the VT reference, nothing else
         unique_vlans = {}
         for v in virtualring["vlans"]:
+            if type(v) is str:
+                virtualring["errors"].append(
+                    "{} - vlan {} is not an objct".format(
+                        virtualring["name"], v
+                    )
+                )
+                virtualring["errors_cat"]["vlan_issues"]["count"] += 1
+                continue
             unique_vlans.setdefault(str(v), [])
             unique_vlans[str(v)].append(v)
         for v in unique_vlans:
@@ -1054,7 +1062,7 @@ class ParserCollection(object):
 
         # we need the logical ring info
         if not self.logicalringinfo:
-            get_logical_ring_info(refresh=True)
+            self.get_logical_ring_info(refresh=True)
 
         virtualrings = []
         self.vringnames = {}  # 'key': [ vringname ]
@@ -1557,7 +1565,7 @@ class ParserCollection(object):
 
         # we need the logical ring info
         if not self.virtualringinfo:
-            get_virtual_ring_info(refresh=True)
+            self.get_virtual_ring_info(refresh=True)
 
         vlans = []
 
@@ -1636,6 +1644,7 @@ class ParserCollection(object):
                             new_vlan_name = "C-{}-{}".format(vlan_id, vs_name)
                             # print("{} - {} - {}".format(pname, name, vs_name))
                             try:
+                                # TODO:  THIS FAILS, WHY EVAL HERE ????
                                 ports = eval(str(vs.port)) or UNKNOWN
                                 _create_update(
                                     {
