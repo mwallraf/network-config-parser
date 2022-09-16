@@ -139,3 +139,5 @@ router-parser/__remove__main.py
 router-parser/test.py
 router-parser/test.csv
 *.1
+
+testdata/
